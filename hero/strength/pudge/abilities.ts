@@ -2,7 +2,7 @@ import { dotaunitorder_t, ExecuteOrder, GameState, Hero, pudge_rot } from "githu
 
 import { PudgeConfig } from "./config"
 import { PudgeState } from "./state"
-import { calcCastPos, isDirectionStable } from "./tracker"
+import { calcCastPos, isDirectionStable, isHookBlocked } from "./tracker"
 
 export function isVulnerable(target: Hero): boolean {
 	return target.IsStunned || target.IsHexed || target.Buffs.some((b: any) => b.Name === "modifier_pudge_meat_hook")
@@ -31,6 +31,10 @@ export function castHook(hero: Hero, target: Hero): boolean {
 	}
 
 	const pos = calcCastPos(hero, target, hookRange)
+	if (PudgeConfig.collisionCheck.value && isHookBlocked(hero, target, pos, PudgeConfig.hookCollisionRadius.value)) {
+		return false
+	}
+
 	ExecuteOrder.PrepareOrder({
 		orderType: dotaunitorder_t.DOTA_UNIT_ORDER_CAST_POSITION,
 		issuers: [hero],

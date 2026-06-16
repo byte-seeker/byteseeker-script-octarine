@@ -2,7 +2,7 @@ import { dotaunitorder_t, EntityManager, ExecuteOrder, GameState, Hero } from "g
 
 import { PudgeConfig } from "./config"
 import { PudgeState } from "./state"
-import { calcCastPos } from "./tracker"
+import { calcCastPos, isHookBlocked } from "./tracker"
 
 export function runAutoKillSteal(hero: Hero): void {
 	if (!PudgeConfig.autoKsEnabled.value || PudgeState.autoKsSleeper.Sleeping) {
@@ -40,6 +40,12 @@ export function runAutoKillSteal(hero: Hero): void {
 
 		if (en.HP <= hookDamage && en.HP > 0) {
 			const pos = calcCastPos(hero, en, hookRange)
+			if (
+				PudgeConfig.collisionCheck.value &&
+				isHookBlocked(hero, en, pos, PudgeConfig.hookCollisionRadius.value)
+			) {
+				continue
+			}
 			ExecuteOrder.PrepareOrder({
 				orderType: dotaunitorder_t.DOTA_UNIT_ORDER_CAST_POSITION,
 				issuers: [hero],

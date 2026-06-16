@@ -1,4 +1,4 @@
-import { GameState, Hero, Vector3 } from "github.com/octarine-public/wrapper/index"
+import { Creep, EntityManager, GameState, Hero, Vector3 } from "github.com/octarine-public/wrapper/index"
 
 import { PudgeConfig } from "./config"
 import { PudgeState } from "./state"
@@ -170,4 +170,45 @@ export function timeToEnterRange(hero: Hero, target: Hero, hookRange: number): n
 
 	const secs = (dist - hookRange) / approach
 	return secs <= PudgeConfig.espApproachSec.value ? secs : null
+}
+
+export function distToSegmentSquared(px: number, py: number, vx: number, vy: number, wx: number, wy: number): number {
+	const l2 = (wx - vx) * (wx - vx) + (wy - vy) * (wy - vy)
+	if (l2 === 0) {
+		return (px - vx) * (px - vx) + (py - vy) * (py - vy)
+	}
+	let t = ((px - vx) * (wx - vx) + (py - vy) * (wy - vy)) / l2
+	t = Math.max(0, Math.min(1, t))
+	const projX = vx + t * (wx - vx)
+	const projY = vy + t * (wy - vy)
+	return (px - projX) * (px - projX) + (py - projY) * (py - projY)
+}
+
+export function isHookBlocked(hero: Hero, target: Hero, castPos: Vector3, radius: number): boolean {
+	const hpos = hero.Position
+	const r2 = radius * radius
+
+	for (const creep of EntityManager.GetEntitiesByClass(Creep)) {
+		if (!creep.IsValid || !creep.IsAlive || !creep.IsVisible) {
+			continue
+		}
+		const cpos = creep.Position
+		const d2 = distToSegmentSquared(cpos.x, cpos.y, hpos.x, hpos.y, castPos.x, castPos.y)
+		if (d2 <= r2) {
+			return true
+		}
+	}
+
+	for (const en of EntityManager.GetEntitiesByClass(Hero)) {
+		if (!en.IsValid || !en.IsAlive || !en.IsVisible || en.Index === hero.Index || en.Index === target.Index) {
+			continue
+		}
+		const epos = en.Position
+		const d2 = distToSegmentSquared(epos.x, epos.y, hpos.x, hpos.y, castPos.x, castPos.y)
+		if (d2 <= r2) {
+			return true
+		}
+	}
+
+	return false
 }

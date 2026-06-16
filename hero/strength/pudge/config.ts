@@ -11,6 +11,8 @@ export const PudgeConfig = new (class {
 	public readonly orbWalkStop = this.entry.AddToggle("Stop-to-Cancel Backswing", false)
 
 	public readonly hookNode = this.entry.AddNode("Hook Settings")
+	public readonly collisionCheck = this.hookNode.AddToggle("Check Collision (Creeps)", true)
+	public readonly hookCollisionRadius = this.hookNode.AddSlider("Collision Radius", 100, 50, 150)
 	public readonly predBufMs = this.hookNode.AddSlider(
 		"Latency Buffer (ms)",
 		50,
