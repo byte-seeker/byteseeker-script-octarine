@@ -636,7 +636,7 @@ new (class PudgeCombo {
 
   if (shouldOn !== active) {
    ExecuteOrder.PrepareOrder({
-    orderType: dotaunitorder_t.DOTA_UNIT_ORDER_CAST_NO_TARGET,
+    orderType: dotaunitorder_t.DOTA_UNIT_ORDER_CAST_TOGGLE,
     issuers: [hero],
     ability: rot.Index,
     queue: false,
@@ -675,7 +675,7 @@ new (class PudgeCombo {
    orderType: dotaunitorder_t.DOTA_UNIT_ORDER_CAST_TARGET,
    issuers: [hero],
    target: target.Index,
-   ability: dis,
+   ability: dis.Index,
    queue: false,
    showEffects: true,
    isPlayerInput: false,
@@ -762,7 +762,7 @@ new (class PudgeCombo {
   // Toggle Rot ON/OFF sesuai kondisi
   if (shouldRotOn !== isRotActive && !this.farmSleeper.Sleeping) {
    ExecuteOrder.PrepareOrder({
-    orderType: dotaunitorder_t.DOTA_UNIT_ORDER_CAST_NO_TARGET,
+    orderType: dotaunitorder_t.DOTA_UNIT_ORDER_CAST_TOGGLE,
     issuers: [hero],
     ability: rot.Index,
     queue: false,
@@ -898,7 +898,7 @@ new (class PudgeCombo {
      orderType: dotaunitorder_t.DOTA_UNIT_ORDER_CAST_POSITION,
      issuers: [hero],
      position: pos,
-     ability: hook,
+     ability: hook.Index,
      queue: false,
      showEffects: true,
      isPlayerInput: false,
