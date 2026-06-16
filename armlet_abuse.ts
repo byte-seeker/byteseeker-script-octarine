@@ -217,7 +217,7 @@ class SmartArmletAbuse {
 		}
 
 		let y = 300
-		RendererSDK.Text("--- Smart Armlet Abuse ---", new Vector2(50, y), Color.Yellow)
+		//RendererSDK.Text("--- Smart Armlet Abuse ---", new Vector2(50, y), Color.Yellow)
 		y += 20
 
 		if (!this.enabled.value) {
