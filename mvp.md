@@ -7,4 +7,9 @@
 - [x] Fix Pudge Hook prediction against charging Spirit Breaker (2026-06-16)
     - [x] Override target velocity in `getVelocity` inside `tracker.ts` using `entity.Forward * entity.MoveSpeed` when target is a charging Spirit Breaker (`IsChargeOfDarkness` or has `"modifier_spirit_breaker_charge_of_darkness"`).
     - [x] Bypass direction stability checks in `isDirectionStable` inside `tracker.ts` to return `true` for a charging Spirit Breaker.
+- [x] Add dynamic Radius feature under Byteseeker menu (2026-06-16)
+    - [x] Implement menu options for Dynamic Attack Range toggle, Style selection dropdown (normal/rope), and ColorPicker for circle color.
+    - [x] Create `radius.ts` with PostDataUpdate hook using `ParticlesSDK.DrawCircle` to dynamically draw the attack range circle around the local hero.
+    - [x] Fix Radius position not sticking to local hero by changing particle attachment from default `PATTACH_ABSORIGIN` to `PATTACH_ABSORIGIN_FOLLOW`.
+    - [x] Import `radius` script in `index.ts`.
 
