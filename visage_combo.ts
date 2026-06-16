@@ -13,6 +13,7 @@ import {
 	TickSleeper,
 	Unit
 } from "github.com/octarine-public/wrapper/index"
+
 import { executeOrbwalk } from "./orbwalker"
 
 new (class VisageCombo {

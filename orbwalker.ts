@@ -45,12 +45,7 @@ export function executeOrbwalk(
 	return smartOrbwalk(hero, target, sleeper, config)
 }
 
-function smartOrbwalk(
-	hero: Hero,
-	target: Hero,
-	sleeper: TickSleeper,
-	config: OrbwalkConfig
-): boolean {
+function smartOrbwalk(hero: Hero, target: Hero, sleeper: TickSleeper, config: OrbwalkConfig): boolean {
 	const isAttackingAnimation = hero.IsInAnimation && hero.LastAnimationIsAttack
 
 	if (isAttackingAnimation) {
@@ -76,11 +71,11 @@ function smartOrbwalk(
 			return true
 		}
 
-		const movePos = calcOrbwalkPosition(hero, target, config.safeDistancePct)
+		const animMovePos = calcOrbwalkPosition(hero, target, config.safeDistancePct)
 		ExecuteOrder.PrepareOrder({
 			orderType: dotaunitorder_t.DOTA_UNIT_ORDER_MOVE_TO_POSITION,
 			issuers: [hero],
-			position: movePos,
+			position: animMovePos,
 			queue: false,
 			showEffects: false,
 			isPlayerInput: false
@@ -137,11 +132,7 @@ function calcOrbwalkPosition(hero: Hero, target: Hero, safeDistancePct: number) 
 	perp.y = perp.y ?? 0
 	const len = Math.sqrt(perp.x * perp.x + perp.y * perp.y)
 	if (len > 0) {
-		return target.Position.Add(new Vector3(
-			(perp.x / len) * safeDist,
-			(perp.y / len) * safeDist,
-			0
-		))
+		return target.Position.Add(new Vector3((perp.x / len) * safeDist, (perp.y / len) * safeDist, 0))
 	}
 
 	// Ultimate fallback — move east
