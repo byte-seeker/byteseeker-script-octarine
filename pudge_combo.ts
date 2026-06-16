@@ -176,6 +176,7 @@ new (class PudgeCombo {
  private readonly autoKsSleeper = new TickSleeper();
  private readonly autoHookSleeper = new TickSleeper();
  private wasRotTurnedOnByFarm = false;
+ private wasRotTurnedOnByCombo = false;
 
  // Per-enemy velocity tracking
  private readonly trackerMap = new Map<number, EnemyTracker>();
@@ -205,6 +206,7 @@ new (class PudgeCombo {
   this.dismemberSleeper.Sleep(0);
   this.comboSequenceGrid = null;
   this.wasRotTurnedOnByFarm = false;
+  this.wasRotTurnedOnByCombo = false;
   this.reinitGrids();
  }
 
@@ -631,24 +633,40 @@ new (class PudgeCombo {
   }
 
   const active = hero.Buffs.some((b: any) => b.Name === "modifier_pudge_rot");
+  
+  if (!active && this.wasRotTurnedOnByCombo) {
+   this.wasRotTurnedOnByCombo = false;
+  }
+
   const shouldOn =
    target !== undefined &&
    hero.Distance2D(target) <= (rot as pudge_rot).GetBaseAOERadiusForLevel(rot.Level) &&
    !target.IsMagicImmune;
 
-  if (shouldOn !== active) {
+  if (shouldOn && !active) {
    ExecuteOrder.PrepareOrder({
     orderType: dotaunitorder_t.DOTA_UNIT_ORDER_CAST_TOGGLE,
     issuers: [hero],
     ability: rot.Index,
     queue: false,
-    showEffects: shouldOn,
+    showEffects: true,
     isPlayerInput: false,
    });
-   this.rotSleeper.Sleep(
-    GameState.InputLag * 1000 + rot.CastPoint * 1000 + 100,
-   );
-   return shouldOn;
+   this.rotSleeper.Sleep(GameState.InputLag * 1000 + 150);
+   this.wasRotTurnedOnByCombo = true;
+   return true;
+  } else if (!shouldOn && active && this.wasRotTurnedOnByCombo) {
+   ExecuteOrder.PrepareOrder({
+    orderType: dotaunitorder_t.DOTA_UNIT_ORDER_CAST_TOGGLE,
+    issuers: [hero],
+    ability: rot.Index,
+    queue: false,
+    showEffects: false,
+    isPlayerInput: false,
+   });
+   this.rotSleeper.Sleep(GameState.InputLag * 1000 + 150);
+   this.wasRotTurnedOnByCombo = false;
+   return true;
   }
   return false;
  }
