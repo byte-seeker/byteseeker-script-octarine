@@ -19,10 +19,19 @@
  "scripts": {
   "check-types": "npx tsc",
   "check-types-watch": "npx tsc --watch",
+  "upgrade-pack": "yarn upgrade-interactive --latest",
   "check-circular": "npx madge --circular index.ts",
   "lint": "eslint -c .eslintrc.json --ext .ts --fix ."
  },
- "license": "MIT",
+ "contributors": [
+  "moofMonkey",
+  "I_GRIN_I",
+  "SicdeX-",
+  "LalkaKaro4",
+  "Bulb4",
+  "0h"
+ ],
+ "license": "GPL-3.0-or-later",
  "repository": {
   "type": "git",
   "directory": "/",

@@ -1,2 +1,9 @@
-# byteseeker-script-octarine
+# Installation
 
+```sh
+npm install
+```
+
+```sh
+yarn install
+```
