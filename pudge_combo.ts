@@ -36,7 +36,7 @@ const STABILITY_WINDOW = 0.3 // seconds — observation window before firing hoo
 
 new (class PudgeCombo {
 	// ── Menu ──────────────────────────────────────────────────────────────
-	private readonly entry = Menu.AddEntry("mm44x").AddNode("Pudge Combo")
+	private readonly entry = Menu.AddEntry("Byteseeker").AddNode("Hero").AddNode("Strength").AddNode("Pudge")
 	private readonly comboEnabled = this.entry.AddToggle("Enable Combo", true)
 	private readonly comboKey = this.entry.AddKeybind("Combo Key", "G", "Hold to execute combo")
 	private readonly comboRadius = this.entry.AddSlider("Target Search Radius", 800, 300, 1500)
