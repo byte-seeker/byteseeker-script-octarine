@@ -99,12 +99,6 @@ new (class PudgeCombo {
 
  // Rot
  private readonly rotEnabled = this.entry.AddToggle("Auto Rot", true);
- private readonly rotMaxRange = this.entry.AddSlider(
-  "Rot Max Range",
-  350,
-  100,
-  450,
- );
 
  // Dismember
  private readonly dismemberNode = this.entry.AddNode("Auto Dismember");
@@ -132,15 +126,6 @@ new (class PudgeCombo {
   "Enabled",
   false,
   "Auto toggle Rot to farm nearby creeps",
- );
-
- private readonly farmRotRange = this.farmNode.AddSlider(
-  "Rot Farm Range",
-  280,
-  100,
-  450,
-  10,
-  "Distance to nearest creep to activate Rot (Rot AoE ≈ 250 units)",
  );
 
  private readonly farmSafeHpPct = this.farmNode.AddSlider(
@@ -645,7 +630,7 @@ new (class PudgeCombo {
   const active = hero.Buffs.some((b: any) => b.Name === "modifier_pudge_rot");
   const shouldOn =
    target !== undefined &&
-   hero.Distance2D(target) <= this.rotMaxRange.value &&
+   hero.Distance2D(target) <= (rot as pudge_rot).GetBaseAOERadiusForLevel(rot.Level) &&
    !target.IsMagicImmune;
 
   if (shouldOn !== active) {
@@ -734,7 +719,7 @@ new (class PudgeCombo {
   if (isRotActive && hpPct <= this.farmSafeHpPct.value) {
    if (!this.farmSleeper.Sleeping) {
     ExecuteOrder.PrepareOrder({
-     orderType: dotaunitorder_t.DOTA_UNIT_ORDER_CAST_NO_TARGET,
+     orderType: dotaunitorder_t.DOTA_UNIT_ORDER_CAST_TOGGLE,
      issuers: [hero],
      ability: rot.Index,
      queue: false,
@@ -746,7 +731,7 @@ new (class PudgeCombo {
    return;
   }
 
-  const rotAoe = this.farmRotRange.value;
+  const rotAoe = (rot as pudge_rot).GetBaseAOERadiusForLevel(rot.Level);
   let shouldRotOn = false;
 
   // Cek creep musuh dalam jangkauan Rot
