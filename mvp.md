@@ -15,4 +15,8 @@
     - [x] Move Radius menu under Utility (hierarchy: Byteseeker -> Utility -> Radius) (2026-06-17)
 - [x] Clean up unused utilities (2026-06-17)
     - [x] Remove unused AutoBootsUtility from `index.ts`.
+- [x] Implement Counter Items feature (2026-06-17)
+    - [x] Create `counter_items.ts` with comprehensive logic mapping hero/item counters and responsive HUD UI.
+    - [x] Add counter_items import in `index.ts`.
+
 

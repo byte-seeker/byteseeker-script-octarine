@@ -4,4 +4,5 @@
 //import "./anti_initiation"
 //import "./auto_save"
 import "./radius"
+import "./counter_items"
 import "./hero/strength/pudge/index"
