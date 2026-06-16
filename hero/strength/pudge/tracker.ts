@@ -48,6 +48,16 @@ export function updateTracker(enemy: Hero): void {
 }
 
 export function getVelocity(idx: number): { vx: number; vy: number } {
+	const entity = EntityManager.EntityByIndex(idx)
+	if (
+		entity instanceof Hero &&
+		(entity.IsChargeOfDarkness || entity.HasBuffByName("modifier_spirit_breaker_charge_of_darkness"))
+	) {
+		const speed = entity.MoveSpeed
+		const forward = entity.Forward
+		return { vx: forward.x * speed, vy: forward.y * speed }
+	}
+
 	const t = PudgeState.trackerMap.get(idx)
 	if (!t || t.samples.length === 0) {
 		return { vx: 0, vy: 0 }
@@ -57,6 +67,14 @@ export function getVelocity(idx: number): { vx: number; vy: number } {
 }
 
 export function isDirectionStable(idx: number): boolean {
+	const entity = EntityManager.EntityByIndex(idx)
+	if (
+		entity instanceof Hero &&
+		(entity.IsChargeOfDarkness || entity.HasBuffByName("modifier_spirit_breaker_charge_of_darkness"))
+	) {
+		return true
+	}
+
 	const t = PudgeState.trackerMap.get(idx)
 	if (!t || t.samples.length < 2) {
 		return true
