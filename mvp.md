@@ -12,4 +12,7 @@
     - [x] Create `radius.ts` with PostDataUpdate hook using `ParticlesSDK.DrawCircle` to dynamically draw the attack range circle around the local hero.
     - [x] Fix Radius position not sticking to local hero by changing particle attachment from default `PATTACH_ABSORIGIN` to `PATTACH_ABSORIGIN_FOLLOW`.
     - [x] Import `radius` script in `index.ts`.
+    - [x] Move Radius menu under Utility (hierarchy: Byteseeker -> Utility -> Radius) (2026-06-17)
+- [x] Clean up unused utilities (2026-06-17)
+    - [x] Remove unused AutoBootsUtility from `index.ts`.
 
