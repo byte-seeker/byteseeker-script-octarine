@@ -137,6 +137,14 @@ new (class PudgeCombo {
   0,
   "Turn off Rot if Pudge HP drops below this %",
  );
+ private readonly farmCreepHpPct = this.farmNode.AddSlider(
+  "Creep HP Threshold %",
+  10,
+  1,
+  100,
+  0,
+  "Minimum creep HP % to activate Rot",
+ );
  private readonly farmMoveToWave = this.farmNode.AddToggle(
   "Move to Nearest Creep",
   true,
@@ -769,8 +777,8 @@ new (class PudgeCombo {
    const d = hero.Distance2D(creep);
    if (d <= rotAoe) {
     creepsInRange++;
-    const rotDamagePerSec = rot.Level * 30;
-    if (creep.HP <= rotDamagePerSec + 40) {
+    const creepHpPct = (creep.HP / creep.MaxHP) * 100;
+    if (creepHpPct <= this.farmCreepHpPct.value) {
      lowHpCreeps++;
     }
    }
