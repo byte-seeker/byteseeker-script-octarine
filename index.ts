@@ -26,7 +26,7 @@ interface ScheduledSwitch {
 }
 
 new (class AutoBootsUtility {
-	private readonly entry = Menu.AddEntry("Byteseeker")
+	private readonly entry = Menu.AddEntry("Byteseeker", "assets/icons/logo_byteseeker_no_bg60px.png")
 
 	// Auto Boots Nodes
 	private readonly bootsTree = this.entry.AddNode("Auto Boots")
