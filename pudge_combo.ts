@@ -144,14 +144,7 @@ new (class PudgeCombo {
   10,
   "Distance to nearest creep to activate Rot (Rot AoE ≈ 250 units)",
  );
- private readonly farmMinCreeps = this.farmNode.AddSlider(
-  "Min Creeps in Range",
-  1,
-  1,
-  6,
-  1,
-  "Minimum creeps within Rot AoE before activating",
- );
+
  private readonly farmSafeHpPct = this.farmNode.AddSlider(
   "Safe HP %",
   40,
@@ -780,7 +773,7 @@ new (class PudgeCombo {
   }
 
   const shouldRotOn =
-   creepsInRange >= this.farmMinCreeps.value &&
+   creepsInRange >= 1 &&
    hpPct > this.farmSafeHpPct.value;
 
   // Toggle Rot ON/OFF sesuai kondisi
