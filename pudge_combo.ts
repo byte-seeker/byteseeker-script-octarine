@@ -146,7 +146,7 @@ new (class PudgeCombo {
  );
  private readonly farmMinCreeps = this.farmNode.AddSlider(
   "Min Creeps in Range",
-  2,
+  1,
   1,
   6,
   1,
@@ -798,24 +798,7 @@ new (class PudgeCombo {
    );
   }
 
-  // Move toward nearest creep jika tidak ada creep dalam range dan fitur aktif
-  if (
-   this.farmMoveToWave.value &&
-   !shouldRotOn &&
-   !isRotActive &&
-   nearestCreep !== undefined &&
-   !this.farmMoveSleeper.Sleeping
-  ) {
-   ExecuteOrder.PrepareOrder({
-    orderType: dotaunitorder_t.DOTA_UNIT_ORDER_MOVE_TO_TARGET,
-    issuers: [hero],
-    target: nearestCreep.Index,
-    queue: false,
-    showEffects: false,
-    isPlayerInput: false,
-   });
-   this.farmMoveSleeper.Sleep(GameState.InputLag * 1000 + 500);
-  }
+  // Auto attack move removed as per user request to only use Rot.
  }
 
  private runAutoHook(hero: Hero): void {
