@@ -1,11 +1,11 @@
 import {
- dotaunitorder_t,
- ExecuteOrder,
- GameState,
- Hero,
- TickSleeper,
- Vector3,
-} from "github.com/octarine-public/wrapper/index";
+	dotaunitorder_t,
+	ExecuteOrder,
+	GameState,
+	Hero,
+	TickSleeper,
+	Vector3
+} from "github.com/octarine-public/wrapper/index"
 
 export interface OrbwalkConfig {
 	enabled: boolean

@@ -19,7 +19,6 @@
 		"eslint-plugin-import",
 		"eslint-plugin-jsdoc",
 		"eslint-plugin-unicorn",
-		"eslint-plugin-import",
 		"eslint-plugin-simple-import-sort",
 		"@typescript-eslint",
 		"unused-imports",
