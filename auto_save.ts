@@ -10,9 +10,9 @@ import {
  Menu,
  ProjectileManager,
  TickSleeper,
-} from "github.com/octarine-public/wrapper/index";
+} from "github.com/octarine-public/wrapper/index"
 
-import { claimOrder } from "./coordination";
+import { claimOrder } from "./coordination"
 
 const FATAL_MODIFIERS = [
  "modifier_legion_commander_duel",
@@ -31,13 +31,13 @@ const FATAL_MODIFIERS = [
  "modifier_primal_beast_pulverize",
  "modifier_ice_blast",
  "modifier_witch_doctor_maledict",
-];
+]
 
 const LOTUS_DEBUFFS = [
  "modifier_bounty_hunter_track",
  "modifier_slardar_corrosive_haze",
  "modifier_spirit_breaker_charge_of_darkness_vision",
-];
+]
 
 const THREAT_MODIFIERS = [
  "modifier_lion_voodoo",
@@ -63,7 +63,7 @@ const THREAT_MODIFIERS = [
  "modifier_stunned",
  "modifier_hexed",
  "modifier_silence",
-];
+]
 
 const THREAT_ABILITIES = [
  "lion_voodoo",
@@ -91,7 +91,7 @@ const THREAT_ABILITIES = [
  "lina_laguna_blade",
  "skywrath_mage_mystic_flare",
  "huskar_life_break",
-];
+]
 
 const THREAT_ITEMS = [
  "item_orchid",
@@ -99,7 +99,7 @@ const THREAT_ITEMS = [
  "item_sheepstick",
  "item_abyssal_blade",
  "item_nullifier",
-];
+]
 
 const REFLECTABLE_SPELLS = [
  "bounty_hunter_track",
@@ -129,7 +129,7 @@ const REFLECTABLE_SPELLS = [
  "item_dagon_3",
  "item_dagon_4",
  "item_dagon_5",
-];
+]
 
 const INSTANT_REFLECTABLE_SPELLS = [
  "lion_voodoo",
@@ -138,7 +138,7 @@ const INSTANT_REFLECTABLE_SPELLS = [
  "item_bloodthorn",
  "item_sheepstick",
  "item_abyssal_blade",
-];
+]
 
 const MAGIC_THREAT_ABILITIES = [
  "lion_voodoo",
@@ -157,7 +157,7 @@ const MAGIC_THREAT_ABILITIES = [
  "invoker_chaos_meteor",
  "invoker_sun_strike",
  "invoker_deafening_blast",
-];
+]
 
 const MAGIC_THREAT_MODIFIERS = [
  "modifier_lion_voodoo",
@@ -170,27 +170,27 @@ const MAGIC_THREAT_MODIFIERS = [
  "modifier_doom_bringer_doom",
  "modifier_item_nullifier_mute",
  "modifier_item_nullifier",
-];
+]
 
 new (class AutoSaveUtility {
- private readonly entry = Menu.AddEntry("Byteseeker");
- private readonly node = this.entry.AddNode("Auto Save");
- private readonly enabled = this.node.AddToggle("Enabled", true);
+ private readonly entry = Menu.AddEntry("Byteseeker")
+ private readonly node = this.entry.AddNode("Auto Save")
+ private readonly enabled = this.node.AddToggle("Enabled", true)
 
  private readonly priority = this.node.AddDropdown(
   "Save Priority",
   ["Self First", "Team First"],
   0,
- );
+ )
 
  private readonly teamFilterNode = this.node.AddNode(
   "Ally Target Filter",
   "menu/icons/dazzle.svg",
- );
- private teamSelector?: Menu.ImageSelector;
+ )
+ private teamSelector?: Menu.ImageSelector
 
  // Hero Spells settings
- private readonly heroSpellsNode = this.node.AddNode("Hero Spells");
+ private readonly heroSpellsNode = this.node.AddNode("Hero Spells")
  private readonly heroSpellsSelector = this.heroSpellsNode.AddImageSelector(
   "Hero Spells Selection",
   [
@@ -213,28 +213,28 @@ new (class AutoSaveUtility {
   ]),
   "Enable or disable specific hero spells for saving",
   true,
- );
+ )
  private readonly heroFatal = this.heroSpellsNode.AddToggle(
   "Save on Fatal Debuffs",
   true,
- );
+ )
  private readonly heroLowHP = this.heroSpellsNode.AddToggle(
   "Save on Low HP",
   true,
- );
+ )
  private readonly heroOnlyDanger = this.heroSpellsNode.AddToggle(
   "Only Save if in Danger",
   true,
- );
+ )
  private readonly heroMinHP = this.heroSpellsNode.AddSlider(
   "Save on HP %",
   15,
   1,
   99,
- );
+ )
 
  // Items settings
- private readonly itemsNode = this.node.AddNode("Items");
+ private readonly itemsNode = this.node.AddNode("Items")
  private readonly itemsSelector = this.itemsNode.AddImageSelector(
   "Items Selection",
   [
@@ -257,136 +257,136 @@ new (class AutoSaveUtility {
   ]),
   "Enable or disable specific items for saving",
   true,
- );
+ )
 
  // Lotus Orb settings
- private readonly lotusNode = this.itemsNode.AddNode("Lotus Orb");
+ private readonly lotusNode = this.itemsNode.AddNode("Lotus Orb")
  private readonly lotusDebuffs = this.lotusNode.AddToggle(
   "Save on Track/Armor Debuffs",
   true,
- );
+ )
  private readonly lotusSilence = this.lotusNode.AddToggle(
   "Save on Silence",
   true,
- );
- private readonly lotusRoot = this.lotusNode.AddToggle("Save on Root", true);
+ )
+ private readonly lotusRoot = this.lotusNode.AddToggle("Save on Root", true)
  private readonly lotusOnlyDanger = this.lotusNode.AddToggle(
   "Only Save if in Danger",
   true,
- );
+ )
  private readonly lotusPredictInstant = this.lotusNode.AddToggle(
   "Predict Instant Spells",
   true,
- );
+ )
 
  // Ethereal Blade settings
- private readonly ebladeNode = this.itemsNode.AddNode("Ethereal Blade");
+ private readonly ebladeNode = this.itemsNode.AddNode("Ethereal Blade")
  private readonly ebladeFatal = this.ebladeNode.AddToggle(
   "Save on Fatal Debuffs",
   true,
- );
+ )
  private readonly ebladeDuelTarget = this.ebladeNode.AddDropdown(
   "Fatal Debuff Target",
   ["Affected Ally", "Enemy Caster"],
   0,
- );
+ )
  private readonly ebladeLowHP = this.ebladeNode.AddToggle(
   "Save on Low HP",
   true,
- );
+ )
  private readonly ebladeOnlyDanger = this.ebladeNode.AddToggle(
   "Only Save if in Danger",
   true,
- );
+ )
  private readonly ebladeMinHP = this.ebladeNode.AddSlider(
   "Save on HP %",
   15,
   1,
   99,
- );
+ )
 
  // Mekansm & Greaves settings
- private readonly mekGreavesNode = this.itemsNode.AddNode("Mekansm & Greaves");
+ private readonly mekGreavesNode = this.itemsNode.AddNode("Mekansm & Greaves")
  private readonly mekGreavesLowHP = this.mekGreavesNode.AddToggle(
   "Save on Low HP",
   true,
- );
+ )
  private readonly mekGreavesOnlyDanger = this.mekGreavesNode.AddToggle(
   "Only Save if in Danger",
   true,
- );
+ )
  private readonly mekGreavesMinHP = this.mekGreavesNode.AddSlider(
   "Save on HP %",
   25,
   1,
   99,
- );
+ )
  private readonly greavesAutoDispel = this.mekGreavesNode.AddToggle(
   "Auto-Dispel Self",
   true,
- );
+ )
 
  // Eul / Wind Waker settings
- private readonly eulWwNode = this.itemsNode.AddNode("Eul / Wind Waker");
+ private readonly eulWwNode = this.itemsNode.AddNode("Eul / Wind Waker")
  private readonly eulSelfLowHP = this.eulWwNode.AddToggle(
   "Save Self on Low HP",
   true,
- );
+ )
  private readonly eulSelfOnlyDanger = this.eulWwNode.AddToggle(
   "Only Save Self in Danger",
   true,
- );
+ )
  private readonly eulSelfMinHP = this.eulWwNode.AddSlider(
   "Save Self on HP %",
   20,
   1,
   99,
- );
+ )
  private readonly eulEnemyInterrupt = this.eulWwNode.AddToggle(
   "Cyclone Enemy Caster",
   true,
- );
+ )
  private readonly wwAllySave = this.eulWwNode.AddToggle(
   "Wind Waker Save Allies",
   true,
- );
+ )
 
  // Manta Style settings
- private readonly mantaNode = this.itemsNode.AddNode("Manta Style");
+ private readonly mantaNode = this.itemsNode.AddNode("Manta Style")
  private readonly mantaDispelSilence = this.mantaNode.AddToggle(
   "Dispel Silence",
   true,
- );
+ )
  private readonly mantaDispelRoot = this.mantaNode.AddToggle(
   "Dispel Root",
   true,
- );
+ )
  private readonly mantaDodgeProjectiles = this.mantaNode.AddToggle(
   "Dodge Projectiles/Threats",
   true,
- );
+ )
  private readonly mantaOnlyDanger = this.mantaNode.AddToggle(
   "Only Save if in Danger",
   true,
- );
+ )
 
- private readonly castSleeper = new TickSleeper();
+ private readonly castSleeper = new TickSleeper()
 
  private executeAndClaimOrder(castFn: () => void, delay: number): void {
-  castFn();
-  claimOrder();
-  this.castSleeper.Sleep(delay);
+  castFn()
+  claimOrder()
+  this.castSleeper.Sleep(delay)
  }
 
  constructor() {
-  EventsSDK.on("PostDataUpdate", this.PostDataUpdate.bind(this));
-  EventsSDK.on("GameEnded", this.GameEnded.bind(this));
+  EventsSDK.on("PostDataUpdate", this.PostDataUpdate.bind(this))
+  EventsSDK.on("GameEnded", this.GameEnded.bind(this))
  }
 
  private getOrderedAllies(hero: Hero, allHeroes: Hero[]): Hero[] {
   const allies = allHeroes.filter(
    (h) => h && h.IsValid && h.IsAlive && !h.IsIllusion && !h.IsEnemy(hero),
-  );
+  )
 
   if (!this.teamSelector) {
    this.teamSelector = this.teamFilterNode.AddImageSelector(
@@ -395,27 +395,27 @@ new (class AutoSaveUtility {
     new Map(),
     "Disable allies you don't want to auto-save",
     true,
-   );
+   )
   }
 
   for (const ally of allies) {
-   const name = ally.Name;
+   const name = ally.Name
    if (!this.teamSelector.values.includes(name)) {
-    this.teamSelector.values.push(name);
-    this.teamSelector.enabledValues.set(name, true);
+    this.teamSelector.values.push(name)
+    this.teamSelector.enabledValues.set(name, true)
    }
   }
 
   const allowed = allies.filter((ally) => {
    if (this.teamSelector && !this.teamSelector.IsEnabled(ally.Name)) {
-    return false;
+    return false
    }
-   return true;
-  });
+   return true
+  })
 
-  const isSelfFirst = this.priority.SelectedID === 0;
-  const self = allowed.find((a) => a === hero);
-  const team = allowed.filter((a) => a !== hero);
+  const isSelfFirst = this.priority.SelectedID === 0
+  const self = allowed.find((a) => a === hero)
+  const team = allowed.filter((a) => a !== hero)
 
   return isSelfFirst
    ? self
@@ -423,15 +423,15 @@ new (class AutoSaveUtility {
      : team
    : self
    ? [...team, self]
-   : team;
+   : team
  }
 
  private get hasLocalHero() {
-  return LocalPlayer?.Hero !== undefined;
+  return LocalPlayer?.Hero !== undefined
  }
 
  private hasFatalDebuff(unit: Hero): boolean {
-  return FATAL_MODIFIERS.some((mod) => unit.HasBuffByName(mod));
+  return FATAL_MODIFIERS.some((mod) => unit.HasBuffByName(mod))
  }
 
  private hasActiveSaveOrImmunity(unit: Hero): boolean {
@@ -446,8 +446,8 @@ new (class AutoSaveUtility {
    "modifier_shadow_demon_disruption",
    "modifier_obsidian_destroyer_astral_imprisonment",
    "modifier_nyx_assassin_spiked_carapace",
-  ];
-  return saveModifiers.some((mod) => unit.HasBuffByName(mod));
+  ]
+  return saveModifiers.some((mod) => unit.HasBuffByName(mod))
  }
 
  private isTargetInDanger(
@@ -459,24 +459,24 @@ new (class AutoSaveUtility {
   localHero: Hero,
  ): boolean {
   if (unit.HPPercent > minHP) {
-   return false;
+   return false
   }
   if (!onlySaveInDanger) {
-   return true;
+   return true
   }
   // If critically low HP (<= 5%), they might die to DoT (damage over time) even if no enemies are nearby
   if (unit.HPPercent <= 5) {
-   return true;
+   return true
   }
   if (unit.IsStunned || unit.IsHexed || unit.IsNightmared || unit.IsSilenced) {
-   return true;
+   return true
   }
   // AA Ice Blast or Witch Doctor Maledict
   if (
    unit.HasBuffByName("modifier_ice_blast") ||
    unit.HasBuffByName("modifier_witch_doctor_maledict")
   ) {
-   return true;
+   return true
   }
   const enemyNearby = allHeroes.some(
    (h) =>
@@ -488,15 +488,15 @@ new (class AutoSaveUtility {
     (unit.Distance2D(h, true) <= 1000 ||
      (h.IsAttacking &&
       h.Distance2D(unit, true) <= h.GetAttackRange(unit) + 200)),
-  );
-  return enemyNearby;
+  )
+  return enemyNearby
  }
 
  private hasActiveThreatModifier(target: Hero): boolean {
   return THREAT_MODIFIERS.some((mod) => {
    if (mod === "modifier_spirit_breaker_charge_of_darkness_vision") {
     if (!target.HasBuffByName(mod)) {
-     return false;
+     return false
     }
     const sb = EntityManager.GetEntitiesByClass(Hero).find(
      (h) =>
@@ -506,22 +506,22 @@ new (class AutoSaveUtility {
       h.IsEnemy(target) &&
       h.Name === "npc_dota_hero_spirit_breaker" &&
       !h.IsIllusion,
-    );
+    )
     if (sb && sb.Distance2D(target, true) > 1000) {
-     return false;
+     return false
     }
-    return true;
+    return true
    }
-   return target.HasBuffByName(mod);
-  });
+   return target.HasBuffByName(mod)
+  })
  }
 
  private isAboutToBeTargetedByThreat(target: Hero, allHeroes: Hero[]): boolean {
   for (const proj of ProjectileManager.AllTrackingProjectiles) {
    if (proj.Target === target && proj.Ability) {
-    const name = proj.Ability.Name;
+    const name = proj.Ability.Name
     if (THREAT_ABILITIES.includes(name) || THREAT_ITEMS.includes(name)) {
-     return true;
+     return true
     }
    }
   }
@@ -534,11 +534,11 @@ new (class AutoSaveUtility {
     enemy.IsEnemy(target) &&
     !enemy.IsIllusion
    ) {
-    const spells = enemy.Spells.filter((s): s is Ability => s !== undefined);
+    const spells = enemy.Spells.filter((s): s is Ability => s !== undefined)
     const items = enemy.HasInventory
      ? enemy.Items.filter((i): i is Item => i !== undefined)
-     : [];
-    const abilities = [...spells, ...items];
+     : []
+    const abilities = [...spells, ...items]
 
     for (const abil of abilities) {
      if (
@@ -546,12 +546,12 @@ new (class AutoSaveUtility {
       (THREAT_ABILITIES.includes(abil.Name) || THREAT_ITEMS.includes(abil.Name))
      ) {
       if (enemy.FindRotationAngle(target) < 0.25) {
-       let castRange = abil.CastRange > 0 ? abil.CastRange : 600;
+       let castRange = abil.CastRange > 0 ? abil.CastRange : 600
        if (abil.Name === "spirit_breaker_charge_of_darkness") {
-        castRange = 1000;
+        castRange = 1000
        }
        if (enemy.Distance2D(target, true) <= castRange + 150) {
-        return true;
+        return true
        }
       }
      }
@@ -568,23 +568,23 @@ new (class AutoSaveUtility {
     enemy.IsEnemy(target) &&
     !enemy.IsIllusion
    ) {
-    const spells = enemy.Spells.filter((s): s is Ability => s !== undefined);
+    const spells = enemy.Spells.filter((s): s is Ability => s !== undefined)
     const items = enemy.HasInventory
      ? enemy.Items.filter((i): i is Item => i !== undefined)
-     : [];
-    const abilities = [...spells, ...items];
+     : []
+    const abilities = [...spells, ...items]
 
     for (const abil of abilities) {
      if (INSTANT_REFLECTABLE_SPELLS.includes(abil.Name)) {
       const isReady =
        (abil.Level > 0 || abil instanceof Item) &&
        abil.Cooldown <= 0.1 &&
-       enemy.IsManaEnough(abil);
+       enemy.IsManaEnough(abil)
       if (isReady) {
        if (enemy.FindRotationAngle(target) < 0.15) {
-        const castRange = abil.CastRange > 0 ? abil.CastRange : 600;
+        const castRange = abil.CastRange > 0 ? abil.CastRange : 600
         if (enemy.Distance2D(target, true) <= castRange + 50) {
-         return true;
+         return true
         }
        }
       }
@@ -593,7 +593,7 @@ new (class AutoSaveUtility {
    }
   }
 
-  return false;
+  return false
  }
 
  private isAboutToBeTargetedByReflectableThreat(
@@ -603,7 +603,7 @@ new (class AutoSaveUtility {
   for (const proj of ProjectileManager.AllTrackingProjectiles) {
    if (proj.Target === target && proj.Ability) {
     if (REFLECTABLE_SPELLS.includes(proj.Ability.Name)) {
-     return true;
+     return true
     }
    }
   }
@@ -616,21 +616,21 @@ new (class AutoSaveUtility {
     enemy.IsEnemy(target) &&
     !enemy.IsIllusion
    ) {
-    const spells = enemy.Spells.filter((s): s is Ability => s !== undefined);
+    const spells = enemy.Spells.filter((s): s is Ability => s !== undefined)
     const items = enemy.HasInventory
      ? enemy.Items.filter((i): i is Item => i !== undefined)
-     : [];
-    const abilities = [...spells, ...items];
+     : []
+    const abilities = [...spells, ...items]
 
     for (const abil of abilities) {
      if (abil.IsInAbilityPhase && REFLECTABLE_SPELLS.includes(abil.Name)) {
       if (enemy.FindRotationAngle(target) < 0.25) {
-       let castRange = abil.CastRange > 0 ? abil.CastRange : 600;
+       let castRange = abil.CastRange > 0 ? abil.CastRange : 600
        if (abil.Name === "spirit_breaker_charge_of_darkness") {
-        castRange = 1000;
+        castRange = 1000
        }
        if (enemy.Distance2D(target, true) <= castRange + 150) {
-        return true;
+        return true
        }
       }
      }
@@ -642,12 +642,12 @@ new (class AutoSaveUtility {
       const isReady =
        (abil.Level > 0 || abil instanceof Item) &&
        abil.Cooldown <= 0.1 &&
-       enemy.IsManaEnough(abil);
+       enemy.IsManaEnough(abil)
       if (isReady) {
        if (enemy.FindRotationAngle(target) < 0.15) {
-        const castRange = abil.CastRange > 0 ? abil.CastRange : 600;
+        const castRange = abil.CastRange > 0 ? abil.CastRange : 600
         if (enemy.Distance2D(target, true) <= castRange + 50) {
-         return true;
+         return true
         }
        }
       }
@@ -656,7 +656,7 @@ new (class AutoSaveUtility {
    }
   }
 
-  return false;
+  return false
  }
 
  private isUnderOrTargetedByMagicThreat(
@@ -665,15 +665,15 @@ new (class AutoSaveUtility {
  ): boolean {
   const hasMagicModifier = MAGIC_THREAT_MODIFIERS.some((mod) =>
    target.HasBuffByName(mod),
-  );
+  )
   if (hasMagicModifier) {
-   return true;
+   return true
   }
 
   for (const proj of ProjectileManager.AllTrackingProjectiles) {
    if (proj.Target === target && proj.Ability) {
     if (MAGIC_THREAT_ABILITIES.includes(proj.Ability.Name)) {
-     return true;
+     return true
     }
    }
   }
@@ -686,18 +686,18 @@ new (class AutoSaveUtility {
     enemy.IsEnemy(target) &&
     !enemy.IsIllusion
    ) {
-    const spells = enemy.Spells.filter((s): s is Ability => s !== undefined);
+    const spells = enemy.Spells.filter((s): s is Ability => s !== undefined)
     const items = enemy.HasInventory
      ? enemy.Items.filter((i): i is Item => i !== undefined)
-     : [];
-    const abilities = [...spells, ...items];
+     : []
+    const abilities = [...spells, ...items]
 
     for (const abil of abilities) {
      if (abil.IsInAbilityPhase && MAGIC_THREAT_ABILITIES.includes(abil.Name)) {
       if (enemy.FindRotationAngle(target) < 0.25) {
-       const castRange = abil.CastRange > 0 ? abil.CastRange : 600;
+       const castRange = abil.CastRange > 0 ? abil.CastRange : 600
        if (enemy.Distance2D(target, true) <= castRange + 150) {
-        return true;
+        return true
        }
       }
      }
@@ -705,7 +705,7 @@ new (class AutoSaveUtility {
    }
   }
 
-  return false;
+  return false
  }
 
  private getEnemyCasterOfThreat(
@@ -720,9 +720,9 @@ new (class AutoSaveUtility {
     h.IsEnemy(target) &&
     h.Name === "npc_dota_hero_legion_commander" &&
     !h.IsIllusion,
-  );
+  )
   if (target.HasBuffByName("modifier_legion_commander_duel") && LC) {
-   return LC;
+   return LC
   }
 
   const Necro = allHeroes.find(
@@ -733,9 +733,9 @@ new (class AutoSaveUtility {
     h.IsEnemy(target) &&
     h.Name === "npc_dota_hero_necrolyte" &&
     !h.IsIllusion,
-  );
+  )
   if (target.HasBuffByName("modifier_necrolyte_reapers_scythe") && Necro) {
-   return Necro;
+   return Necro
   }
 
   const Bane = allHeroes.find(
@@ -746,9 +746,9 @@ new (class AutoSaveUtility {
     h.IsEnemy(target) &&
     h.Name === "npc_dota_hero_bane" &&
     !h.IsIllusion,
-  );
+  )
   if (target.HasBuffByName("modifier_bane_fiends_grip") && Bane) {
-   return Bane;
+   return Bane
   }
 
   const Batrider = allHeroes.find(
@@ -759,9 +759,9 @@ new (class AutoSaveUtility {
     h.IsEnemy(target) &&
     h.Name === "npc_dota_hero_batrider" &&
     !h.IsIllusion,
-  );
+  )
   if (target.HasBuffByName("modifier_batrider_flaming_lasso") && Batrider) {
-   return Batrider;
+   return Batrider
   }
 
   const SS = allHeroes.find(
@@ -772,13 +772,13 @@ new (class AutoSaveUtility {
     h.IsEnemy(target) &&
     h.Name === "npc_dota_hero_shadow_shaman" &&
     !h.IsIllusion,
-  );
+  )
   if (
    (target.HasBuffByName("modifier_shadow_shaman_shackles") ||
     target.HasBuffByName("modifier_shadow_shaman_voodoo")) &&
    SS
   ) {
-   return SS;
+   return SS
   }
 
   const Lion = allHeroes.find(
@@ -789,9 +789,9 @@ new (class AutoSaveUtility {
     h.IsEnemy(target) &&
     h.Name === "npc_dota_hero_lion" &&
     !h.IsIllusion,
-  );
+  )
   if (target.HasBuffByName("modifier_lion_voodoo") && Lion) {
-   return Lion;
+   return Lion
   }
 
   const Doom = allHeroes.find(
@@ -802,9 +802,9 @@ new (class AutoSaveUtility {
     h.IsEnemy(target) &&
     h.Name === "npc_dota_hero_doom_bringer" &&
     !h.IsIllusion,
-  );
+  )
   if (target.HasBuffByName("modifier_doom_bringer_doom") && Doom) {
-   return Doom;
+   return Doom
   }
 
   const Pudge = allHeroes.find(
@@ -815,9 +815,9 @@ new (class AutoSaveUtility {
     h.IsEnemy(target) &&
     h.Name === "npc_dota_hero_pudge" &&
     !h.IsIllusion,
-  );
+  )
   if (target.HasBuffByName("modifier_pudge_dismember") && Pudge) {
-   return Pudge;
+   return Pudge
   }
 
   const PB = allHeroes.find(
@@ -828,9 +828,9 @@ new (class AutoSaveUtility {
     h.IsEnemy(target) &&
     h.Name === "npc_dota_hero_primal_beast" &&
     !h.IsIllusion,
-  );
+  )
   if (target.HasBuffByName("modifier_primal_beast_pulverize") && PB) {
-   return PB;
+   return PB
   }
 
   const Axe = allHeroes.find(
@@ -841,9 +841,9 @@ new (class AutoSaveUtility {
     h.IsEnemy(target) &&
     h.Name === "npc_dota_hero_axe" &&
     !h.IsIllusion,
-  );
+  )
   if (target.HasBuffByName("modifier_axe_berserkers_call") && Axe) {
-   return Axe;
+   return Axe
   }
 
   const SB = allHeroes.find(
@@ -854,12 +854,12 @@ new (class AutoSaveUtility {
     h.IsEnemy(target) &&
     h.Name === "npc_dota_hero_spirit_breaker" &&
     !h.IsIllusion,
-  );
+  )
   if (
    target.HasBuffByName("modifier_spirit_breaker_charge_of_darkness_vision") &&
    SB
   ) {
-   return SB;
+   return SB
   }
 
   for (const enemy of allHeroes) {
@@ -870,18 +870,18 @@ new (class AutoSaveUtility {
     enemy.IsEnemy(target) &&
     !enemy.IsIllusion
    ) {
-    const spells = enemy.Spells.filter((s): s is Ability => s !== undefined);
+    const spells = enemy.Spells.filter((s): s is Ability => s !== undefined)
     const items = enemy.HasInventory
      ? enemy.Items.filter((i): i is Item => i !== undefined)
-     : [];
-    const abilities = [...spells, ...items];
+     : []
+    const abilities = [...spells, ...items]
     for (const abil of abilities) {
      if (
       abil.IsInAbilityPhase &&
       (THREAT_ABILITIES.includes(abil.Name) || THREAT_ITEMS.includes(abil.Name))
      ) {
       if (enemy.FindRotationAngle(target) < 0.25) {
-       return enemy;
+       return enemy
       }
      }
     }
@@ -894,12 +894,12 @@ new (class AutoSaveUtility {
     proj.Source instanceof Hero &&
     proj.Source.IsEnemy(target)
    ) {
-    return proj.Source;
+    return proj.Source
    }
   }
 
-  let closestEnemy: Hero | undefined;
-  let minDist = Infinity;
+  let closestEnemy: Hero | undefined
+  let minDist = Infinity
   for (const enemy of allHeroes) {
    if (
     enemy &&
@@ -908,14 +908,14 @@ new (class AutoSaveUtility {
     enemy.IsEnemy(target) &&
     !enemy.IsIllusion
    ) {
-    const dist = target.Distance2D(enemy, true);
+    const dist = target.Distance2D(enemy, true)
     if (dist < minDist) {
-     minDist = dist;
-     closestEnemy = enemy;
+     minDist = dist
+     closestEnemy = enemy
     }
    }
   }
-  return closestEnemy;
+  return closestEnemy
  }
 
  private shouldSaveTarget(
@@ -928,48 +928,48 @@ new (class AutoSaveUtility {
   fatalEnabled: boolean,
  ): boolean {
   if (this.hasActiveSaveOrImmunity(target)) {
-   return false;
+   return false
   }
   if (fatalEnabled) {
    if (this.hasFatalDebuff(target) || this.hasActiveThreatModifier(target)) {
-    return true;
+    return true
    }
    if (this.isAboutToBeTargetedByThreat(target, allHeroes)) {
-    return true;
+    return true
    }
   }
   if (lowHPEnabled) {
    if (
     this.isTargetInDanger(target, minHP, onlySaveInDanger, allHeroes, localHero)
    ) {
-    return true;
+    return true
    }
   }
-  return false;
+  return false
  }
 
  private PostDataUpdate(delta: number): void {
   if (delta === 0 || !this.hasLocalHero || ExecuteOrder.DisableHumanizer) {
-   return;
+   return
   }
 
-  const hero = LocalPlayer?.Hero;
+  const hero = LocalPlayer?.Hero
   if (hero === undefined || !hero.IsValid || !hero.IsAlive) {
-   return;
+   return
   }
 
   if (!this.enabled.value || this.castSleeper.Sleeping) {
-   return;
+   return
   }
 
   // Do not disrupt active channeling or break invisibility
   if (hero.IsChanneling || hero.IsInvisible) {
-   return;
+   return
   }
 
-  const allHeroes = EntityManager.GetEntitiesByClass(Hero);
-  const delay = GameState.InputLag * 1000 + Math.randomRange(50, 150);
-  const orderedAllies = this.getOrderedAllies(hero, allHeroes);
+  const allHeroes = EntityManager.GetEntitiesByClass(Hero)
+  const delay = GameState.InputLag * 1000 + Math.randomRange(50, 150)
+  const orderedAllies = this.getOrderedAllies(hero, allHeroes)
 
   // 1. Dazzle Shallow Grave Logic
   if (
@@ -979,7 +979,7 @@ new (class AutoSaveUtility {
    !hero.IsStunned &&
    !hero.IsHexed
   ) {
-   const grave = hero.GetAbilityByName("dazzle_shallow_grave");
+   const grave = hero.GetAbilityByName("dazzle_shallow_grave")
    if (
     grave &&
     grave.IsValid &&
@@ -987,7 +987,7 @@ new (class AutoSaveUtility {
     grave.Cooldown <= 0.1 &&
     hero.IsManaEnough(grave)
    ) {
-    const castRange = grave.CastRange > 0 ? grave.CastRange : 600;
+    const castRange = grave.CastRange > 0 ? grave.CastRange : 600
 
     for (const target of orderedAllies) {
      if (
@@ -1002,8 +1002,8 @@ new (class AutoSaveUtility {
       )
      ) {
       if (hero.Distance2D(target, true) <= castRange) {
-       this.executeAndClaimOrder(() => hero.CastTarget(grave, target), delay);
-       return;
+       this.executeAndClaimOrder(() => hero.CastTarget(grave, target), delay)
+       return
       }
      }
     }
@@ -1019,7 +1019,7 @@ new (class AutoSaveUtility {
    !hero.IsStunned &&
    !hero.IsHexed
   ) {
-   const box = hero.GetAbilityByName("ringmaster_the_box");
+   const box = hero.GetAbilityByName("ringmaster_the_box")
    if (
     box &&
     box.IsValid &&
@@ -1027,7 +1027,7 @@ new (class AutoSaveUtility {
     box.Cooldown <= 0.1 &&
     hero.IsManaEnough(box)
    ) {
-    const castRange = box.CastRange > 0 ? box.CastRange : 600;
+    const castRange = box.CastRange > 0 ? box.CastRange : 600
 
     // Step 1: Always check self first (can't save others if you're dead)
     if (
@@ -1041,14 +1041,14 @@ new (class AutoSaveUtility {
       this.heroFatal.value,
      )
     ) {
-     this.executeAndClaimOrder(() => hero.CastTarget(box, hero), delay);
-     return;
+     this.executeAndClaimOrder(() => hero.CastTarget(box, hero), delay)
+     return
     }
 
     // Step 2: Check allies
     for (const target of orderedAllies) {
      if (target === hero) {
-      continue;
+      continue
      }
      if (
       this.shouldSaveTarget(
@@ -1062,8 +1062,8 @@ new (class AutoSaveUtility {
       )
      ) {
       if (hero.Distance2D(target, true) <= castRange) {
-       this.executeAndClaimOrder(() => hero.CastTarget(box, target), delay);
-       return;
+       this.executeAndClaimOrder(() => hero.CastTarget(box, target), delay)
+       return
       }
      }
     }
@@ -1078,7 +1078,7 @@ new (class AutoSaveUtility {
    !hero.IsStunned &&
    !hero.IsHexed
   ) {
-   const disruption = hero.GetAbilityByName("shadow_demon_disruption");
+   const disruption = hero.GetAbilityByName("shadow_demon_disruption")
    if (
     disruption &&
     disruption.IsValid &&
@@ -1086,7 +1086,7 @@ new (class AutoSaveUtility {
     disruption.Cooldown <= 0.1 &&
     hero.IsManaEnough(disruption)
    ) {
-    const castRange = disruption.CastRange > 0 ? disruption.CastRange : 600;
+    const castRange = disruption.CastRange > 0 ? disruption.CastRange : 600
 
     for (const target of orderedAllies) {
      if (
@@ -1104,8 +1104,8 @@ new (class AutoSaveUtility {
        this.executeAndClaimOrder(
         () => hero.CastTarget(disruption, target),
         delay,
-       );
-       return;
+       )
+       return
       }
      }
     }
@@ -1120,7 +1120,7 @@ new (class AutoSaveUtility {
    !hero.IsStunned &&
    !hero.IsHexed
   ) {
-   const swap = hero.GetAbilityByName("vengefulspirit_nether_swap");
+   const swap = hero.GetAbilityByName("vengefulspirit_nether_swap")
    if (
     swap &&
     swap.IsValid &&
@@ -1128,12 +1128,12 @@ new (class AutoSaveUtility {
     swap.Cooldown <= 0.1 &&
     hero.IsManaEnough(swap)
    ) {
-    const castRange = swap.CastRange > 0 ? swap.CastRange : 700;
+    const castRange = swap.CastRange > 0 ? swap.CastRange : 700
 
     for (const target of orderedAllies) {
      // Nether Swap cannot target self
      if (target === hero) {
-      continue;
+      continue
      }
 
      if (
@@ -1148,8 +1148,8 @@ new (class AutoSaveUtility {
       )
      ) {
       if (hero.Distance2D(target, true) <= castRange) {
-       this.executeAndClaimOrder(() => hero.CastTarget(swap, target), delay);
-       return;
+       this.executeAndClaimOrder(() => hero.CastTarget(swap, target), delay)
+       return
       }
      }
     }
@@ -1164,7 +1164,7 @@ new (class AutoSaveUtility {
    !hero.IsStunned &&
    !hero.IsHexed
   ) {
-   const decrepify = hero.GetAbilityByName("pugna_decrepify");
+   const decrepify = hero.GetAbilityByName("pugna_decrepify")
    if (
     decrepify &&
     decrepify.IsValid &&
@@ -1172,7 +1172,7 @@ new (class AutoSaveUtility {
     decrepify.Cooldown <= 0.1 &&
     hero.IsManaEnough(decrepify)
    ) {
-    const castRange = decrepify.CastRange > 0 ? decrepify.CastRange : 700;
+    const castRange = decrepify.CastRange > 0 ? decrepify.CastRange : 700
 
     for (const target of orderedAllies) {
      // Skip if already ethereal/ghost
@@ -1181,14 +1181,14 @@ new (class AutoSaveUtility {
        b.Name === "modifier_item_ethereal_blade_ethereal" ||
        b.Name === "modifier_ghost" ||
        b.Name === "modifier_pugna_decrepify",
-     );
+     )
      if (isTargetEthereal) {
-      continue;
+      continue
      }
 
      // Prevent Decrepify on ally if under or targeted by magic threat
      if (this.isUnderOrTargetedByMagicThreat(target, allHeroes)) {
-      continue;
+      continue
      }
 
      if (
@@ -1206,8 +1206,8 @@ new (class AutoSaveUtility {
        this.executeAndClaimOrder(
         () => hero.CastTarget(decrepify, target),
         delay,
-       );
-       return;
+       )
+       return
       }
      }
     }
@@ -1222,7 +1222,7 @@ new (class AutoSaveUtility {
    !hero.IsStunned &&
    !hero.IsHexed
   ) {
-   const carapace = hero.GetAbilityByName("nyx_assassin_spiked_carapace");
+   const carapace = hero.GetAbilityByName("nyx_assassin_spiked_carapace")
    if (
     carapace &&
     carapace.IsValid &&
@@ -1242,8 +1242,8 @@ new (class AutoSaveUtility {
       this.heroFatal.value,
      )
     ) {
-     this.executeAndClaimOrder(() => hero.CastNoTarget(carapace), delay);
-     return;
+     this.executeAndClaimOrder(() => hero.CastNoTarget(carapace), delay)
+     return
     }
    }
   }
@@ -1256,7 +1256,7 @@ new (class AutoSaveUtility {
    !hero.IsStunned &&
    !hero.IsHexed
   ) {
-   const fate = hero.GetAbilityByName("oracle_false_promise");
+   const fate = hero.GetAbilityByName("oracle_false_promise")
    if (
     fate &&
     fate.IsValid &&
@@ -1264,17 +1264,17 @@ new (class AutoSaveUtility {
     fate.Cooldown <= 0.1 &&
     hero.IsManaEnough(fate)
    ) {
-    const castRange = fate.CastRange > 0 ? fate.CastRange : 700;
+    const castRange = fate.CastRange > 0 ? fate.CastRange : 700
 
     for (const target of orderedAllies) {
      // Skip if target already has False Promise
      if (target.HasBuffByName("modifier_oracle_false_promise")) {
-      continue;
+      continue
      }
 
      // Don't cast on self if we have a better save item (e.g., Aeon Disk active)
      if (target === hero && this.hasActiveSaveOrImmunity(hero)) {
-      continue;
+      continue
      }
 
      if (
@@ -1289,8 +1289,8 @@ new (class AutoSaveUtility {
       )
      ) {
       if (hero.Distance2D(target, true) <= castRange) {
-       this.executeAndClaimOrder(() => hero.CastTarget(fate, target), delay);
-       return;
+       this.executeAndClaimOrder(() => hero.CastTarget(fate, target), delay)
+       return
       }
      }
     }
@@ -1304,14 +1304,14 @@ new (class AutoSaveUtility {
    !hero.IsStunned &&
    !hero.IsHexed
   ) {
-   const eblade = hero.GetItemByName("item_ethereal_blade");
+   const eblade = hero.GetItemByName("item_ethereal_blade")
    if (
     eblade &&
     eblade.CanBeUsable &&
     eblade.Cooldown <= 0.1 &&
     hero.IsManaEnough(eblade)
    ) {
-    const castRange = eblade.CastRange;
+    const castRange = eblade.CastRange
 
     for (const target of orderedAllies) {
      // Check if target is already ethereal/ghosted
@@ -1320,20 +1320,20 @@ new (class AutoSaveUtility {
        b.Name === "modifier_item_ethereal_blade_ethereal" ||
        b.Name === "modifier_ghost" ||
        b.Name === "modifier_pugna_decrepify",
-     );
+     )
      if (isTargetEthereal) {
-      continue;
+      continue
      }
 
      // Skip target if they already have active save or banish/immunity
      if (this.hasActiveSaveOrImmunity(target)) {
-      continue;
+      continue
      }
 
      const isFatal =
       this.hasFatalDebuff(target) ||
       this.hasActiveThreatModifier(target) ||
-      this.isAboutToBeTargetedByThreat(target, allHeroes);
+      this.isAboutToBeTargetedByThreat(target, allHeroes)
      const isHPDanger =
       this.ebladeLowHP.value &&
       this.isTargetInDanger(
@@ -1342,7 +1342,7 @@ new (class AutoSaveUtility {
        this.ebladeOnlyDanger.value,
        allHeroes,
        hero,
-      );
+      )
 
      // Handle Fatal Debuffs save logic
      if (isFatal && this.ebladeFatal.value) {
@@ -1351,27 +1351,27 @@ new (class AutoSaveUtility {
        // Prevent EBlade on ally if under or targeted by magic threat
        if (!this.isUnderOrTargetedByMagicThreat(target, allHeroes)) {
         if (hero.Distance2D(target, true) <= castRange) {
-         hero.CastTarget(eblade, target);
-         this.castSleeper.Sleep(delay);
-         return;
+         hero.CastTarget(eblade, target)
+         this.castSleeper.Sleep(delay)
+         return
         }
        }
       } else {
        // Target enemy Caster
-       const caster = this.getEnemyCasterOfThreat(target, allHeroes);
+       const caster = this.getEnemyCasterOfThreat(target, allHeroes)
        if (caster && !caster.IsMagicImmune && !caster.IsDebuffImmune) {
         const isCasterEthereal = caster.Buffs.some(
          (b) =>
           b.Name === "modifier_item_ethereal_blade_ethereal" ||
           b.Name === "modifier_ghost" ||
           b.Name === "modifier_pugna_decrepify",
-        );
+        )
         if (!isCasterEthereal && hero.Distance2D(caster, true) <= castRange) {
          this.executeAndClaimOrder(
           () => hero.CastTarget(eblade, caster),
           delay,
-         );
-         return;
+         )
+         return
         }
        }
       }
@@ -1382,8 +1382,8 @@ new (class AutoSaveUtility {
       // Prevent EBlade on ally if under or targeted by magic threat
       if (!this.isUnderOrTargetedByMagicThreat(target, allHeroes)) {
        if (hero.Distance2D(target, true) <= castRange) {
-        this.executeAndClaimOrder(() => hero.CastTarget(eblade, target), delay);
-        return;
+        this.executeAndClaimOrder(() => hero.CastTarget(eblade, target), delay)
+        return
        }
       }
      }
@@ -1398,27 +1398,27 @@ new (class AutoSaveUtility {
    !hero.IsStunned &&
    !hero.IsHexed
   ) {
-   const lotus = hero.GetItemByName("item_lotus_orb");
+   const lotus = hero.GetItemByName("item_lotus_orb")
    if (
     lotus &&
     lotus.CanBeUsable &&
     lotus.Cooldown <= 0.1 &&
     hero.IsManaEnough(lotus)
    ) {
-    const castRange = 900;
+    const castRange = 900
 
     for (const target of orderedAllies) {
      if (target.HasBuffByName("modifier_item_lotus_orb_active")) {
-      continue;
+      continue
      }
 
-     let shouldLotus = false;
+     let shouldLotus = false
 
      if (this.lotusDebuffs.value) {
       const hasTrackOrHaze = LOTUS_DEBUFFS.some((mod) => {
        if (mod === "modifier_spirit_breaker_charge_of_darkness_vision") {
         if (!target.HasBuffByName(mod)) {
-         return false;
+         return false
         }
         const sb = allHeroes.find(
          (h) =>
@@ -1428,44 +1428,44 @@ new (class AutoSaveUtility {
           h.IsEnemy(target) &&
           h.Name === "npc_dota_hero_spirit_breaker" &&
           !h.IsIllusion,
-        );
+        )
         if (sb && sb.Distance2D(target, true) > 1000) {
-         return false;
+         return false
         }
-        return true;
+        return true
        }
-       return target.HasBuffByName(mod);
-      });
+       return target.HasBuffByName(mod)
+      })
       if (hasTrackOrHaze) {
-       shouldLotus = true;
+       shouldLotus = true
       }
      }
 
      if (this.lotusSilence.value && target.IsSilenced) {
       if (!target.HasBuffByName("modifier_doom_bringer_doom")) {
-       shouldLotus = true;
+       shouldLotus = true
       }
      }
 
      if (this.lotusRoot.value && target.IsRooted) {
-      shouldLotus = true;
+      shouldLotus = true
      }
 
      if (
       !shouldLotus &&
       this.isAboutToBeTargetedByReflectableThreat(target, allHeroes)
      ) {
-      shouldLotus = true;
+      shouldLotus = true
      }
 
      if (shouldLotus) {
       const inDanger =
        !this.lotusOnlyDanger.value ||
-       this.isTargetInDanger(target, 100, true, allHeroes, hero);
+       this.isTargetInDanger(target, 100, true, allHeroes, hero)
       if (inDanger) {
        if (hero.Distance2D(target, true) <= castRange) {
-        this.executeAndClaimOrder(() => hero.CastTarget(lotus, target), delay);
-        return;
+        this.executeAndClaimOrder(() => hero.CastTarget(lotus, target), delay)
+        return
        }
       }
      }
@@ -1480,7 +1480,7 @@ new (class AutoSaveUtility {
    !hero.IsStunned &&
    !hero.IsHexed
   ) {
-   const mek = hero.GetItemByName("item_mekansm");
+   const mek = hero.GetItemByName("item_mekansm")
    if (
     mek &&
     mek.CanBeUsable &&
@@ -1489,10 +1489,10 @@ new (class AutoSaveUtility {
    ) {
     const hasAllyInDanger = orderedAllies.some((target) => {
      if (hero.Distance2D(target, true) > 1200) {
-      return false;
+      return false
      }
      if (target.HasBuffByName("modifier_item_mekansm_no_heal")) {
-      return false;
+      return false
      }
      return (
       this.mekGreavesLowHP.value &&
@@ -1503,12 +1503,12 @@ new (class AutoSaveUtility {
        allHeroes,
        hero,
       )
-     );
-    });
+     )
+    })
 
     if (hasAllyInDanger) {
-     this.executeAndClaimOrder(() => hero.CastNoTarget(mek), delay);
-     return;
+     this.executeAndClaimOrder(() => hero.CastNoTarget(mek), delay)
+     return
     }
    }
   }
@@ -1520,22 +1520,22 @@ new (class AutoSaveUtility {
    !hero.IsStunned &&
    !hero.IsHexed
   ) {
-   const greaves = hero.GetItemByName("item_guardian_greaves");
+   const greaves = hero.GetItemByName("item_guardian_greaves")
    if (greaves && greaves.CanBeUsable && greaves.Cooldown <= 0.1) {
     // 1. Check if we need to auto-dispel self
-    let shouldCastGreaves = false;
+    let shouldCastGreaves = false
     if (this.greavesAutoDispel.value && (hero.IsSilenced || hero.IsRooted)) {
-     shouldCastGreaves = true;
+     shouldCastGreaves = true
     }
 
     // 2. Check if any ally within radius needs healing
     if (!shouldCastGreaves) {
      shouldCastGreaves = orderedAllies.some((target) => {
       if (hero.Distance2D(target, true) > 1200) {
-       return false;
+       return false
       }
       if (target.HasBuffByName("modifier_item_mekansm_no_heal")) {
-       return false;
+       return false
       }
       return (
        this.mekGreavesLowHP.value &&
@@ -1546,13 +1546,13 @@ new (class AutoSaveUtility {
         allHeroes,
         hero,
        )
-      );
-     });
+      )
+     })
     }
 
     if (shouldCastGreaves) {
-     this.executeAndClaimOrder(() => hero.CastNoTarget(greaves), delay);
-     return;
+     this.executeAndClaimOrder(() => hero.CastNoTarget(greaves), delay)
+     return
     }
    }
   }
@@ -1564,18 +1564,18 @@ new (class AutoSaveUtility {
    !hero.IsStunned &&
    !hero.IsHexed
   ) {
-   const ww = hero.GetItemByName("item_wind_waker");
-   const eul = hero.GetItemByName("item_cyclone");
+   const ww = hero.GetItemByName("item_wind_waker")
+   const eul = hero.GetItemByName("item_cyclone")
    const cycloneItem =
     ww && ww.CanBeUsable && ww.Cooldown <= 0.1 && hero.IsManaEnough(ww)
      ? ww
      : eul && eul.CanBeUsable && eul.Cooldown <= 0.1 && hero.IsManaEnough(eul)
      ? eul
-     : undefined;
+     : undefined
 
    if (cycloneItem) {
-    const isWindWaker = cycloneItem.Name === "item_wind_waker";
-    const castRange = 575;
+    const isWindWaker = cycloneItem.Name === "item_wind_waker"
+    const castRange = 575
 
     // 1. Self Save
     if (this.eulSelfLowHP.value && !hero.IsSilenced) {
@@ -1585,8 +1585,8 @@ new (class AutoSaveUtility {
       this.eulSelfOnlyDanger.value,
       allHeroes,
       hero,
-     );
-     const isSelfCycloned = hero.HasBuffByName("modifier_euler_cyclone");
+     )
+     const isSelfCycloned = hero.HasBuffByName("modifier_euler_cyclone")
      if (
       selfInDanger &&
       !isSelfCycloned &&
@@ -1595,8 +1595,8 @@ new (class AutoSaveUtility {
       this.executeAndClaimOrder(
        () => hero.CastTarget(cycloneItem, hero),
        delay,
-      );
-      return;
+      )
+      return
      }
     }
 
@@ -1606,9 +1606,9 @@ new (class AutoSaveUtility {
       const isFatal =
        this.hasFatalDebuff(target) ||
        this.hasActiveThreatModifier(target) ||
-       this.isAboutToBeTargetedByThreat(target, allHeroes);
+       this.isAboutToBeTargetedByThreat(target, allHeroes)
       if (isFatal) {
-       const enemyCaster = this.getEnemyCasterOfThreat(target, allHeroes);
+       const enemyCaster = this.getEnemyCasterOfThreat(target, allHeroes)
        if (
         enemyCaster &&
         enemyCaster.IsValid &&
@@ -1621,8 +1621,8 @@ new (class AutoSaveUtility {
          this.executeAndClaimOrder(
           () => hero.CastTarget(cycloneItem, enemyCaster),
           delay,
-         );
-         return;
+         )
+         return
         }
        }
       }
@@ -1633,35 +1633,35 @@ new (class AutoSaveUtility {
     if (isWindWaker && this.wwAllySave.value && !hero.IsSilenced) {
      for (const target of orderedAllies) {
       if (target === hero) {
-       continue;
+       continue
       }
 
       if (
        target.HasBuffByName("modifier_euler_cyclone") ||
        this.hasActiveSaveOrImmunity(target)
       ) {
-       continue;
+       continue
       }
 
       const isFatal =
        this.hasFatalDebuff(target) ||
        this.hasActiveThreatModifier(target) ||
-       this.isAboutToBeTargetedByThreat(target, allHeroes);
+       this.isAboutToBeTargetedByThreat(target, allHeroes)
       const isHPDanger = this.isTargetInDanger(
        target,
        this.eulSelfMinHP.value,
        this.eulSelfOnlyDanger.value,
        allHeroes,
        hero,
-      );
+      )
 
       if (isFatal || isHPDanger) {
        if (hero.Distance2D(target, true) <= castRange) {
         this.executeAndClaimOrder(
          () => hero.CastTarget(cycloneItem, target),
          delay,
-        );
-        return;
+        )
+        return
        }
       }
      }
@@ -1676,21 +1676,21 @@ new (class AutoSaveUtility {
    !hero.IsStunned &&
    !hero.IsHexed
   ) {
-   const manta = hero.GetItemByName("item_manta");
+   const manta = hero.GetItemByName("item_manta")
    if (
     manta &&
     manta.CanBeUsable &&
     manta.Cooldown <= 0.1 &&
     hero.IsManaEnough(manta)
    ) {
-    let shouldCastManta = false;
+    let shouldCastManta = false
 
     // 1. Dispel Silence / Root
     if (this.mantaDispelSilence.value && hero.IsSilenced) {
-     shouldCastManta = true;
+     shouldCastManta = true
     }
     if (this.mantaDispelRoot.value && hero.IsRooted) {
-     shouldCastManta = true;
+     shouldCastManta = true
     }
 
     // 2. Dodge Projectiles or incoming threats targeted at us
@@ -1699,23 +1699,23 @@ new (class AutoSaveUtility {
       this.isAboutToBeTargetedByReflectableThreat(hero, allHeroes) ||
       this.isUnderOrTargetedByMagicThreat(hero, allHeroes)
      ) {
-      shouldCastManta = true;
+      shouldCastManta = true
      }
     }
 
     // 3. Dispel fatal debuffs / active threats (stun, hex, silence, track, etc.)
     if (!shouldCastManta) {
      if (this.hasFatalDebuff(hero) || this.hasActiveThreatModifier(hero)) {
-      shouldCastManta = true;
+      shouldCastManta = true
      }
     }
 
     if (shouldCastManta) {
      const inDanger =
       !this.mantaOnlyDanger.value ||
-      this.isTargetInDanger(hero, 100, true, allHeroes, hero);
+      this.isTargetInDanger(hero, 100, true, allHeroes, hero)
      if (inDanger) {
-      this.executeAndClaimOrder(() => hero.CastNoTarget(manta), delay);
+      this.executeAndClaimOrder(() => hero.CastNoTarget(manta), delay)
      }
     }
    }
@@ -1723,10 +1723,10 @@ new (class AutoSaveUtility {
  }
 
  private GameEnded(): void {
-  this.castSleeper.ResetTimer();
+  this.castSleeper.ResetTimer()
   if (this.teamSelector) {
-   this.teamSelector.values = [];
-   this.teamSelector.enabledValues.clear();
+   this.teamSelector.values = []
+   this.teamSelector.enabledValues.clear()
   }
  }
-})();
+})()
