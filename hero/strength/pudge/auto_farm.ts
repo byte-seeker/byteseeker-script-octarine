@@ -49,7 +49,7 @@ export function runAutoFarm(hero: Hero): void {
 		return
 	}
 
-	if (!isRotActive && PudgeState.wasRotTurnedOnByFarm) {
+	if (!isRotActive && PudgeState.wasRotTurnedOnByFarm && !PudgeState.farmSleeper.Sleeping) {
 		PudgeState.wasRotTurnedOnByFarm = false
 	}
 
