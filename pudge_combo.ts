@@ -722,7 +722,7 @@ new (class PudgeCombo {
     ExecuteOrder.PrepareOrder({
      orderType: dotaunitorder_t.DOTA_UNIT_ORDER_CAST_TOGGLE,
      issuers: [hero],
-     ability: rot,
+     ability: rot.Index,
      queue: false,
      showEffects: false,
      isPlayerInput: false,
