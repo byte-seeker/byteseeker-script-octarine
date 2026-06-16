@@ -62,7 +62,6 @@ new (class PudgeCombo {
   80,
   10,
   100,
-  5,
  );
  private readonly orbWalkStop = this.entry.AddToggle(
   "Stop-to-Cancel Backswing",
@@ -76,7 +75,7 @@ new (class PudgeCombo {
   50,
   0,
   200,
-  10,
+  0,
   "Added on top of physics intercept for server latency",
  );
  private readonly requireStable = this.hookNode.AddToggle(
@@ -89,7 +88,7 @@ new (class PudgeCombo {
   25,
   5,
   60,
-  5,
+  0,
   "Max direction deviation to consider movement stable",
  );
 
@@ -100,7 +99,6 @@ new (class PudgeCombo {
   350,
   100,
   450,
-  25,
  );
 
  // Dismember
@@ -121,7 +119,6 @@ new (class PudgeCombo {
   200,
   0,
   600,
-  25,
  );
 
  // Auto Farm
@@ -131,11 +128,7 @@ new (class PudgeCombo {
   false,
   "Auto toggle Rot to farm nearby creeps",
  );
- private readonly farmKey = this.farmNode.AddKeybind(
-  "Farm Key",
-  "None",
-  "Hold to activate auto farm (overrides toggle)",
- );
+
  private readonly farmRotRange = this.farmNode.AddSlider(
   "Rot Farm Range",
   280,
@@ -150,7 +143,7 @@ new (class PudgeCombo {
   40,
   10,
   80,
-  5,
+  0,
   "Turn off Rot if Pudge HP drops below this %",
  );
  private readonly farmMoveToWave = this.farmNode.AddToggle(
@@ -707,8 +700,7 @@ new (class PudgeCombo {
   * - Opsional: jalan ke arah creep wave terdekat
   */
  private runAutoFarm(hero: Hero): void {
-  // @ts-ignore
-  const farmActive = this.farmEnabled.value || this.farmKey.isPressed;
+  const farmActive = this.farmEnabled.value;
   if (!farmActive) {
    return;
   }
