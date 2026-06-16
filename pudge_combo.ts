@@ -83,6 +83,11 @@ new (class PudgeCombo {
   true,
   "Observe 0.3s enemy movement before firing hook",
  );
+ private readonly autoKsEnabled = this.hookNode.AddToggle(
+  "Auto KS with Hook",
+  true,
+  "Automatically hook enemies if their HP is low enough to die",
+ );
  private readonly stableThreshDeg = this.hookNode.AddSlider(
   "Stability Threshold (deg)",
   25,
@@ -179,10 +184,11 @@ new (class PudgeCombo {
 
  // Sleepers
  private readonly sleeper = new TickSleeper();
- private readonly autoHookSleeper = new TickSleeper();
  private readonly rotSleeper = new TickSleeper();
+ private readonly dismemberSleeper = new TickSleeper();
  private readonly farmSleeper = new TickSleeper();
- private readonly farmMoveSleeper = new TickSleeper();
+ private readonly autoKsSleeper = new TickSleeper();
+ private readonly autoHookSleeper = new TickSleeper();
 
  // Per-enemy velocity tracking
  private readonly trackerMap = new Map<number, EnemyTracker>();
@@ -208,7 +214,8 @@ new (class PudgeCombo {
   this.rotSleeper.Sleep(0);
   this.trackerMap.clear();
   this.farmSleeper.Sleep(0);
-  this.farmMoveSleeper.Sleep(0);
+  this.autoKsSleeper.Sleep(0);
+  this.dismemberSleeper.Sleep(0);
   this.comboSequenceGrid = null;
   this.reinitGrids();
  }
@@ -740,11 +747,9 @@ new (class PudgeCombo {
   }
 
   const rotAoe = this.farmRotRange.value;
-  let creepsInRange = 0;
-  let nearestCreep: Creep | undefined;
-  let nearestCreepDist = Infinity;
+  let shouldRotOn = false;
 
-  // Hitung creep musuh dalam jangkauan Rot
+  // Cek creep musuh dalam jangkauan Rot
   for (const creep of EntityManager.GetEntitiesByClass(Creep)) {
    if (
     !creep.IsValid ||
@@ -756,17 +761,17 @@ new (class PudgeCombo {
    }
    const d = hero.Distance2D(creep);
    if (d <= rotAoe) {
-    creepsInRange++;
-   }
-   if (d < nearestCreepDist) {
-    nearestCreepDist = d;
-    nearestCreep = creep;
+    // Estimasi Rot damage: level * 30 per detik.
+    // Kita aktifkan jika HP creep di bawah threshold tersebut (sekitar 1 detik Rot).
+    const rotDamagePerSec = rot.Level * 30;
+    if (creep.HP <= rotDamagePerSec + 40) {
+     shouldRotOn = true;
+     break;
+    }
    }
   }
 
-  const shouldRotOn =
-   creepsInRange >= 1 &&
-   hpPct > this.farmSafeHpPct.value;
+  shouldRotOn = shouldRotOn && (hpPct > this.farmSafeHpPct.value);
 
   // Toggle Rot ON/OFF sesuai kondisi
   if (shouldRotOn !== isRotActive && !this.farmSleeper.Sleeping) {
@@ -861,6 +866,65 @@ new (class PudgeCombo {
   );
  }
 
+ private runAutoKillSteal(hero: Hero): void {
+  if (!this.autoKsEnabled.value || this.autoKsSleeper.Sleeping) {
+   return;
+  }
+  if (hero.IsChanneling || hero.IsStunned || hero.IsSilenced || hero.IsHexed || hero.IsInvisible) {
+   return;
+  }
+
+  const hook = hero.GetAbilityByName("pudge_meat_hook");
+  if (
+   !hook ||
+   !hook.IsValid ||
+   hook.Level <= 0 ||
+   hook.Cooldown > 0.1 ||
+   hero.Mana < hook.ManaCost
+  ) {
+   return;
+  }
+
+  const hookRange = hook.CastRange > 0 ? hook.CastRange : 1300;
+
+  for (const en of EntityManager.GetEntitiesByClass(Hero)) {
+   if (
+    !en.IsValid ||
+    !en.IsAlive ||
+    !en.IsVisible ||
+    !en.IsEnemy(hero) ||
+    en.IsIllusion ||
+    en.IsMagicImmune ||
+    en.IsDebuffImmune
+   ) {
+    continue;
+   }
+   
+   if (hero.Distance2D(en) > hookRange) {
+    continue;
+   }
+
+   const hookDamage = hook.GetDamage(en);
+   
+   if (en.HP <= hookDamage && en.HP > 0) {
+    const pos = this.calcCastPos(hero, en, hookRange);
+    ExecuteOrder.PrepareOrder({
+     orderType: dotaunitorder_t.DOTA_UNIT_ORDER_CAST_POSITION,
+     issuers: [hero],
+     position: pos,
+     ability: hook.Index,
+     queue: false,
+     showEffects: true,
+     isPlayerInput: false,
+    });
+    this.autoKsSleeper.Sleep(
+     GameState.InputLag * 1000 + hook.CastPoint * 1000 + 150,
+    );
+    break; // Only cast once
+   }
+  }
+ }
+
  // ── Main Loop ─────────────────────────────────────────────────────────
 
  private PostDataUpdate(delta: number): void {
@@ -893,6 +957,7 @@ new (class PudgeCombo {
 
   this.runAutoFarm(hero);
   this.runAutoHook(hero);
+  this.runAutoKillSteal(hero);
 
   // @ts-ignore
   if (!this.comboKey.isPressed) {
