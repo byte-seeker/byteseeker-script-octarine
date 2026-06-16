@@ -15,16 +15,19 @@ export const PudgeState = new (class {
 
 	public readonly trackerMap = new Map<number, EnemyTracker>()
 
+	public lastRawGameTime = 0
+
 	public onGameEnded(): void {
-		this.sleeper.Sleep(0)
-		this.autoHookSleeper.Sleep(0)
-		this.rotSleeper.Sleep(0)
+		this.sleeper.ResetTimer()
+		this.autoHookSleeper.ResetTimer()
+		this.rotSleeper.ResetTimer()
 		this.trackerMap.clear()
-		this.farmSleeper.Sleep(0)
-		this.autoKsSleeper.Sleep(0)
-		this.dismemberSleeper.Sleep(0)
+		this.farmSleeper.ResetTimer()
+		this.autoKsSleeper.ResetTimer()
+		this.dismemberSleeper.ResetTimer()
 
 		this.wasRotTurnedOnByFarm = false
 		this.wasRotTurnedOnByCombo = false
+		this.lastRawGameTime = 0
 	}
 })()

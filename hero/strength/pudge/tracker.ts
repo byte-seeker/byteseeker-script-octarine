@@ -23,7 +23,7 @@ export function updateTracker(enemy: Hero): void {
 		return
 	}
 	const dt = now - t.lastTime
-	if (dt < 0) {
+	if (dt < 0 || dt > 1.0) {
 		t.samples = []
 		t.lastX = pos.x
 		t.lastY = pos.y

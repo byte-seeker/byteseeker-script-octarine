@@ -1,4 +1,11 @@
-import { EntityManager, EventsSDK, ExecuteOrder, Hero, LocalPlayer } from "github.com/octarine-public/wrapper/index"
+import {
+	EntityManager,
+	EventsSDK,
+	ExecuteOrder,
+	GameState,
+	Hero,
+	LocalPlayer
+} from "github.com/octarine-public/wrapper/index"
 
 import { runAutoFarm } from "./auto_farm"
 import { runAutoHook } from "./auto_hook"
@@ -39,6 +46,12 @@ new (class PudgeModule {
 		) {
 			return
 		}
+
+		const now = GameState.RawGameTime
+		if (now < PudgeState.lastRawGameTime) {
+			PudgeState.onGameEnded()
+		}
+		PudgeState.lastRawGameTime = now
 
 		for (const en of EntityManager.GetEntitiesByClass(Hero)) {
 			if (en.IsValid && en.IsAlive && en.IsVisible && en.IsEnemy(hero) && !en.IsIllusion) {
