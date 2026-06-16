@@ -22,7 +22,25 @@ export function castHook(hero: Hero, target: Hero): boolean {
 		return false
 	}
 
-	if (isVulnerable(target) && PudgeConfig.dismemberEnabled.value) {
+	const isBeingHooked = target.Buffs.some((b: any) => b.Name === "modifier_pudge_meat_hook")
+	if (isBeingHooked) {
+		return false
+	}
+
+	const dismember = hero.GetAbilityByName("pudge_dismember")
+	const hasDismember =
+		dismember !== undefined &&
+		dismember.IsValid &&
+		dismember.Level > 0 &&
+		dismember.Cooldown <= 0.1 &&
+		hero.Mana >= dismember.ManaCost
+	const dismemberRange = dismember && dismember.CastRange > 0 ? dismember.CastRange : 150
+	if (
+		isVulnerable(target) &&
+		PudgeConfig.dismemberEnabled.value &&
+		hasDismember &&
+		hero.Distance2D(target) <= dismemberRange
+	) {
 		return false
 	}
 
