@@ -175,6 +175,7 @@ new (class PudgeCombo {
  private readonly farmSleeper = new TickSleeper();
  private readonly autoKsSleeper = new TickSleeper();
  private readonly autoHookSleeper = new TickSleeper();
+ private wasRotTurnedOnByFarm = false;
 
  // Per-enemy velocity tracking
  private readonly trackerMap = new Map<number, EnemyTracker>();
@@ -203,6 +204,7 @@ new (class PudgeCombo {
   this.autoKsSleeper.Sleep(0);
   this.dismemberSleeper.Sleep(0);
   this.comboSequenceGrid = null;
+  this.wasRotTurnedOnByFarm = false;
   this.reinitGrids();
  }
 
@@ -732,46 +734,62 @@ new (class PudgeCombo {
    return;
   }
 
+  // Reset state jika user mematikan rot manual
+  if (!isRotActive && this.wasRotTurnedOnByFarm) {
+   this.wasRotTurnedOnByFarm = false;
+  }
+
   const rotAoe = (rot as pudge_rot).GetBaseAOERadiusForLevel(rot.Level);
-  let shouldRotOn = false;
+  let creepsInRange = 0;
+  let lowHpCreeps = 0;
 
   // Cek creep musuh dalam jangkauan Rot
   for (const creep of EntityManager.GetEntitiesByClass(Creep)) {
-   if (
-    !creep.IsValid ||
-    !creep.IsAlive ||
-    !creep.IsVisible ||
-    !creep.IsEnemy(hero)
-   ) {
+   if (!creep.IsValid || !creep.IsAlive || !creep.IsVisible || !creep.IsEnemy(hero)) {
     continue;
    }
    const d = hero.Distance2D(creep);
    if (d <= rotAoe) {
-    // Estimasi Rot damage: level * 30 per detik.
-    // Kita aktifkan jika HP creep di bawah threshold tersebut (sekitar 1 detik Rot).
+    creepsInRange++;
     const rotDamagePerSec = rot.Level * 30;
     if (creep.HP <= rotDamagePerSec + 40) {
-     shouldRotOn = true;
-     break;
+     lowHpCreeps++;
     }
    }
   }
 
-  shouldRotOn = shouldRotOn && (hpPct > this.farmSafeHpPct.value);
-
-  // Toggle Rot ON/OFF sesuai kondisi
-  if (shouldRotOn !== isRotActive && !this.farmSleeper.Sleeping) {
-   ExecuteOrder.PrepareOrder({
-    orderType: dotaunitorder_t.DOTA_UNIT_ORDER_CAST_TOGGLE,
-    issuers: [hero],
-    ability: rot.Index,
-    queue: false,
-    showEffects: shouldRotOn,
-    isPlayerInput: false,
-   });
-   this.farmSleeper.Sleep(
-    GameState.InputLag * 1000 + rot.CastPoint * 1000 + 150,
-   );
+  if (!isRotActive) {
+   // Jika rot mati, nyalakan HANYA jika ada creep yang low HP
+   if (lowHpCreeps > 0 && !this.farmSleeper.Sleeping && hpPct > this.farmSafeHpPct.value) {
+    ExecuteOrder.PrepareOrder({
+     orderType: dotaunitorder_t.DOTA_UNIT_ORDER_CAST_TOGGLE,
+     issuers: [hero],
+     ability: rot.Index,
+     queue: false,
+     showEffects: true,
+     isPlayerInput: false,
+    });
+    // Sleep setelah toggle ON agar stabil
+    this.farmSleeper.Sleep(GameState.InputLag * 1000 + rot.CastPoint * 1000 + 300);
+    this.wasRotTurnedOnByFarm = true;
+   }
+  } else {
+   // Jika rot menyala dan KITA yang menyalakannya
+   if (this.wasRotTurnedOnByFarm && !this.farmSleeper.Sleeping) {
+    // Matikan HANYA jika sudah tidak ada creep sama sekali
+    if (creepsInRange === 0 || hpPct <= this.farmSafeHpPct.value) {
+     ExecuteOrder.PrepareOrder({
+      orderType: dotaunitorder_t.DOTA_UNIT_ORDER_CAST_TOGGLE,
+      issuers: [hero],
+      ability: rot.Index,
+      queue: false,
+      showEffects: false,
+      isPlayerInput: false,
+     });
+     this.farmSleeper.Sleep(GameState.InputLag * 1000 + 300);
+     this.wasRotTurnedOnByFarm = false;
+    }
+   }
   }
 
   // Auto attack move removed as per user request to only use Rot.
