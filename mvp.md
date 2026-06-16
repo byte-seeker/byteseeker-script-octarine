@@ -18,5 +18,6 @@
 - [x] Implement Counter Items feature (2026-06-17)
     - [x] Create `counter_items.ts` with comprehensive logic mapping hero/item counters and responsive HUD UI.
     - [x] Add counter_items import in `index.ts`.
+    - [x] Update Counter Items UI: Rename header to "Counter Items" and render the countered hero & reason side-by-side to the right of each item (2026-06-17)
 
 

@@ -641,7 +641,7 @@ class CounterItemsUtility {
 		}
 
 		// Calculate counter scores
-		const scores: Record<string, { score: number; reasons: string[] }> = {}
+		const scores: Record<string, { score: number; reasons: { hero: string; text: string }[] }> = {}
 
 		// Initialize scores
 		for (const key of Object.keys(ITEM_DISPLAY_NAMES)) {
@@ -670,7 +670,10 @@ class CounterItemsUtility {
 					const itemKey = rule.counterItem
 					if (scores[itemKey]) {
 						scores[itemKey].score += rule.weight
-						scores[itemKey].reasons.push(`${rule.reason} (${cleanName})`)
+						scores[itemKey].reasons.push({
+							hero: cleanName,
+							text: rule.reason
+						})
 					}
 				}
 			}
@@ -683,7 +686,10 @@ class CounterItemsUtility {
 							const itemKey = rule.counterItem
 							if (scores[itemKey]) {
 								scores[itemKey].score += rule.weight
-								scores[itemKey].reasons.push(`${rule.reason} (${cleanName})`)
+								scores[itemKey].reasons.push({
+									hero: cleanName,
+									text: rule.reason
+								})
 							}
 						}
 					}
@@ -772,9 +778,11 @@ class CounterItemsUtility {
 		const scaleVal = this.scale.value / 100
 		const x = this.posX.value
 		const y = this.posY.value
-		const width = Math.round(300 * scaleVal)
+		const showReasons = this.showReasons.value
+
+		const width = showReasons ? Math.round(550 * scaleVal) : Math.round(300 * scaleVal)
 		const headerHeight = Math.round(34 * scaleVal)
-		const itemHeight = this.showReasons.value ? Math.round(48 * scaleVal) : Math.round(34 * scaleVal)
+		const itemHeight = showReasons ? Math.round(48 * scaleVal) : Math.round(34 * scaleVal)
 		const totalHeight = headerHeight + topSuggestions.length * itemHeight + Math.round(6 * scaleVal)
 
 		const font = "PTSans"
@@ -786,7 +794,7 @@ class CounterItemsUtility {
 		RendererSDK.OutlinedRect(new Vector2(x, y), new Vector2(width, totalHeight), 1, borderCol)
 
 		// 2. Draw Header
-		const headerText = "Counter Items Suggestion"
+		const headerText = "Counter Items"
 		const headerFontSize = Math.round(13 * scaleVal)
 		const textSz = RendererSDK.GetTextSize(headerText, font, headerFontSize, 700)
 		const headerTextPos = new Vector2(x + (width - textSz.x) / 2, y + Math.round(8 * scaleVal))
@@ -801,20 +809,50 @@ class CounterItemsUtility {
 			1
 		)
 
+		// 3b. Draw Vertical Divider (only if showReasons is true)
+		if (showReasons) {
+			const verticalDividerX = x + Math.round(240 * scaleVal)
+			RendererSDK.Line(
+				new Vector2(verticalDividerX, y + headerHeight + Math.round(4 * scaleVal)),
+				new Vector2(verticalDividerX, y + totalHeight - Math.round(8 * scaleVal)),
+				Color.LightGray.SetA(50),
+				1
+			)
+		}
+
 		// 4. Draw Suggested Items
 		let currentY = y + headerHeight + Math.round(4 * scaleVal)
 		const itemFontSize = Math.round(11 * scaleVal)
 		const reasonFontSize = Math.round(9 * scaleVal)
 
-		for (const suggestion of topSuggestions) {
+		for (let i = 0; i < topSuggestions.length; i++) {
+			const suggestion = topSuggestions[i]
+			const itemIndex = i + 1
 			const texturePath = ImageData.GetItemTexture(suggestion.key)
 			const iconSize = new Vector2(Math.round(36 * scaleVal), Math.round(25 * scaleVal))
-			const iconPos = new Vector2(
-				x + Math.round(10 * scaleVal),
-				currentY + Math.round((itemHeight - iconSize.y) / 2)
+
+			// Draw index number
+			const numberText = `${itemIndex}.`
+			const numberX = x + Math.round(10 * scaleVal)
+			const numberY = showReasons
+				? currentY + Math.round((itemHeight - 11 * scaleVal) / 2)
+				: currentY + Math.round(8 * scaleVal)
+			RendererSDK.Text(
+				numberText,
+				new Vector2(numberX, numberY),
+				Color.LightGray.SetA(220),
+				font,
+				itemFontSize,
+				600,
+				false,
+				true
 			)
 
 			// Draw item icon
+			const iconPos = new Vector2(
+				x + Math.round(28 * scaleVal),
+				currentY + Math.round((itemHeight - iconSize.y) / 2)
+			)
 			if (texturePath !== "") {
 				RendererSDK.Image(texturePath, iconPos, -1, iconSize)
 			} else {
@@ -823,9 +861,9 @@ class CounterItemsUtility {
 			}
 
 			// Draw item name
-			const nameX = x + Math.round(54 * scaleVal)
-			const nameY = this.showReasons.value
-				? currentY + Math.round(4 * scaleVal)
+			const nameX = x + Math.round(72 * scaleVal)
+			const nameY = showReasons
+				? currentY + Math.round((itemHeight - 11 * scaleVal) / 2)
 				: currentY + Math.round(8 * scaleVal)
 			RendererSDK.Text(
 				suggestion.name,
@@ -838,21 +876,92 @@ class CounterItemsUtility {
 				true
 			)
 
-			// Draw reasons
-			if (this.showReasons.value && suggestion.reasons.length > 0) {
-				// Display top 2 reasons max to prevent clutter
-				const reasonsToShow = suggestion.reasons.slice(0, 2).join(", ")
-				const reasonY = currentY + Math.round(24 * scaleVal)
-				RendererSDK.Text(
-					reasonsToShow,
-					new Vector2(nameX, reasonY),
-					Color.LightGray.SetA(200),
-					font,
-					reasonFontSize,
-					400,
-					false,
-					true
-				)
+			// Draw reasons to the right
+			if (showReasons && suggestion.reasons.length > 0) {
+				const reasonsToShow = suggestion.reasons.slice(0, 2)
+				const reasonX = x + Math.round(252 * scaleVal)
+
+				if (reasonsToShow.length === 1) {
+					const reason = reasonsToShow[0]
+					const reasonY = currentY + Math.round((itemHeight - 9 * scaleVal) / 2)
+					const heroText = `${reason.hero}: `
+					const heroTextWidth = RendererSDK.GetTextSize(heroText, font, reasonFontSize, 600, false).x
+
+					RendererSDK.Text(
+						heroText,
+						new Vector2(reasonX, reasonY),
+						Color.Yellow,
+						font,
+						reasonFontSize,
+						600,
+						false,
+						true
+					)
+					RendererSDK.Text(
+						reason.text,
+						new Vector2(reasonX + heroTextWidth, reasonY),
+						Color.LightGray.SetA(220),
+						font,
+						reasonFontSize,
+						400,
+						false,
+						true
+					)
+				} else if (reasonsToShow.length >= 2) {
+					const reason1 = reasonsToShow[0]
+					const reason2 = reasonsToShow[1]
+
+					const reason1Y = currentY + Math.round(6 * scaleVal)
+					const reason2Y = currentY + Math.round(24 * scaleVal)
+
+					// Reason 1
+					const heroText1 = `${reason1.hero}: `
+					const heroTextWidth1 = RendererSDK.GetTextSize(heroText1, font, reasonFontSize, 600, false).x
+					RendererSDK.Text(
+						heroText1,
+						new Vector2(reasonX, reason1Y),
+						Color.Yellow,
+						font,
+						reasonFontSize,
+						600,
+						false,
+						true
+					)
+					RendererSDK.Text(
+						reason1.text,
+						new Vector2(reasonX + heroTextWidth1, reason1Y),
+						Color.LightGray.SetA(220),
+						font,
+						reasonFontSize,
+						400,
+						false,
+						true
+					)
+
+					// Reason 2
+					const heroText2 = `${reason2.hero}: `
+					const heroTextWidth2 = RendererSDK.GetTextSize(heroText2, font, reasonFontSize, 600, false).x
+					RendererSDK.Text(
+						heroText2,
+						new Vector2(reasonX, reason2Y),
+						Color.Yellow,
+						font,
+						reasonFontSize,
+						600,
+						false,
+						true
+					)
+					RendererSDK.Text(
+						reason2.text,
+						new Vector2(reasonX + heroTextWidth2, reason2Y),
+						Color.LightGray.SetA(220),
+						font,
+						reasonFontSize,
+						400,
+						false,
+						true
+					)
+				}
 			}
 
 			currentY += itemHeight
