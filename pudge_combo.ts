@@ -235,7 +235,7 @@ new (class PudgeCombo {
 	 * Computes optimal hook cast position using physics-based intercept.
 	 * Clamps result to hook range if out of bounds.
 	 */
-	private calcCastPos(hero: Hero, target: Hero, hookRange: number): { x: number; y: number; z: number } {
+	private calcCastPos(hero: Hero, target: Hero, hookRange: number): Vector3 {
 		const hp = hero.Position
 		const tp = target.Position
 		const vel = this.getVelocity(target.Index)
@@ -264,7 +264,7 @@ new (class PudgeCombo {
 			cy = hp.y + dy * ratio
 		}
 
-		return { x: cx, y: cy, z: tp.z }
+		return new Vector3(cx, cy, tp.z)
 	}
 
 	/**
@@ -293,9 +293,8 @@ new (class PudgeCombo {
 		for (let i = 0; i < segs; i++) {
 			if (i % 2 !== 0) continue
 			const a = (i / segs) * Math.PI * 2
-			// @ts-ignore
 			const sp = RendererSDK.WorldToScreen(new Vector3(cx + Math.cos(a) * r, cy + Math.sin(a) * r, cz))
-			if (sp !== null) RendererSDK.FilledCircle(sp, new Vector2(3, 3), col)
+			if (sp !== null && sp !== undefined) RendererSDK.FilledCircle(sp as Vector2, new Vector2(3, 3), col)
 		}
 	}
 
@@ -323,7 +322,7 @@ new (class PudgeCombo {
 		// Range circle around Pudge
 		if (this.espRangeCircle.value) {
 			const p = hero.Position
-			const col = hookReady ? Color.Cyan.SetA(180) : Color.Gray.SetA(100)
+			const col = hookReady ? Color.Aqua.SetA(180) : Color.Gray.SetA(100)
 			this.drawDotCircle(p.x, p.y, p.z, hookRange, col)
 		}
 
@@ -375,7 +374,7 @@ new (class PudgeCombo {
 				// @ts-ignore
 				const cs = RendererSDK.WorldToScreen(new Vector3(cast.x, cast.y, cast.z)) as Vector2 | null
 				if (hs !== null && cs !== null) {
-					const col = stable ? Color.Cyan.SetA(220) : Color.Red.SetA(220)
+					const col = stable ? Color.Aqua.SetA(220) : Color.Red.SetA(220)
 					this.drawLine(hs, cs, col)
 					RendererSDK.FilledCircle(cs, new Vector2(7, 7), col)
 				}

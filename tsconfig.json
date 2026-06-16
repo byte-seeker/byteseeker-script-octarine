@@ -3,8 +3,11 @@
 		"target": "esnext",
 		"module": "ES2022",
 		"moduleResolution": "Node",
-		"rootDir": "../../../",
-		"baseUrl": "../../../",
+		"baseUrl": ".",
+		"paths": {
+			"github.com/octarine-public/wrapper/*": ["../other/wrapper/*"],
+			"github.com/octarine-public/wrapper": ["../other/wrapper/index"]
+		},
 		"noEmit": true,
 		"outDir": "scripts/",
 		"noUnusedLocals": true,
@@ -14,15 +17,15 @@
 		"forceConsistentCasingInFileNames": true,
 		"lib": [
 			"ESNext"
-		],
+		]
 	},
 	"include": [
 		"./**/*.ts",
-		"../../**/*.d.ts"
+		"../other/wrapper/**/*.d.ts"
 	],
 	"exclude": [
 		"node_modules/**/*",
-		"scripts_files/**/*",
+		"scripts_files/**/*"
 	],
 	"compileOnSave": true
 }
