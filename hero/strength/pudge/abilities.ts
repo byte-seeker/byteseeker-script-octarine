@@ -4,6 +4,7 @@ import {
 	ExecuteOrder,
 	GameState,
 	Hero,
+	ProjectileManager,
 	pudge_rot
 } from "github.com/octarine-public/wrapper/index"
 
@@ -229,5 +230,66 @@ export function runHookCancel(hero: Hero): void {
 		isHookBlocked(hero, target, PudgeState.lastHookCastPos, hook)
 	) {
 		cancelHook(hero)
+	}
+}
+
+export function runAutoMeatShield(hero: Hero): void {
+	const currentHp = hero.HP
+	const lastHp = PudgeState.lastMeatShieldHp !== undefined ? PudgeState.lastMeatShieldHp : currentHp
+	PudgeState.lastMeatShieldHp = currentHp
+
+	if (!PudgeConfig.meatShieldEnabled.value || PudgeState.meatShieldSleeper.Sleeping) {
+		return
+	}
+	if (hero.IsChanneling || hero.IsStunned || hero.IsSilenced || hero.IsHexed || hero.IsInvisible) {
+		return
+	}
+
+	const fleshHeap = hero.GetAbilityByName("pudge_flesh_heap")
+	if (
+		!fleshHeap ||
+		!fleshHeap.IsValid ||
+		fleshHeap.Level <= 0 ||
+		!fleshHeap.IsCooldownReady ||
+		hero.Mana < fleshHeap.ManaCost
+	) {
+		return
+	}
+
+	const hasShieldActive = hero.Buffs.some((b: any) => b.Name === "modifier_pudge_flesh_heap_block")
+	if (hasShieldActive) {
+		return
+	}
+
+	let shouldActivate = false
+
+	// 1. Check incoming projectiles
+	if (PudgeConfig.meatShieldOnProjectile.value) {
+		const incoming = ProjectileManager.AllTrackingProjectiles.some(
+			proj => proj.Target === hero && !proj.IsDodged && (proj.IsAttack ? proj.Source instanceof Hero : true)
+		)
+		if (incoming) {
+			shouldActivate = true
+		}
+	}
+
+	// 2. Check HP drop
+	if (!shouldActivate && PudgeConfig.meatShieldOnHpDrop.value) {
+		const hpDrop = lastHp - currentHp
+		if (hpDrop >= PudgeConfig.meatShieldHpThreshold.value) {
+			shouldActivate = true
+		}
+	}
+
+	if (shouldActivate) {
+		ExecuteOrder.PrepareOrder({
+			orderType: dotaunitorder_t.DOTA_UNIT_ORDER_CAST_NO_TARGET,
+			issuers: [hero],
+			ability: fleshHeap.Index,
+			queue: false,
+			showEffects: true,
+			isPlayerInput: false
+		})
+		PudgeState.meatShieldSleeper.Sleep(GameState.InputLag * 1000 + 200)
 	}
 }

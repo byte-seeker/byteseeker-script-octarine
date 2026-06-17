@@ -66,6 +66,31 @@ export const PudgeConfig = new (class {
 
 	public readonly rotEnabled = this.entry.AddToggle("Auto Rot", true)
 
+	public readonly meatShieldNode = this.entry.AddNode("Auto Meat Shield")
+	public readonly meatShieldEnabled = this.meatShieldNode.AddToggle(
+		"Enabled",
+		true,
+		"Auto use Meat Shield (Flesh Heap) to block incoming damage"
+	)
+	public readonly meatShieldOnProjectile = this.meatShieldNode.AddToggle(
+		"On Incoming Projectile",
+		true,
+		"Activate when an incoming spell or hero attack projectile is detected"
+	)
+	public readonly meatShieldOnHpDrop = this.meatShieldNode.AddToggle(
+		"On HP Drop (Burst)",
+		true,
+		"Activate when Pudge HP drops quickly"
+	)
+	public readonly meatShieldHpThreshold = this.meatShieldNode.AddSlider(
+		"HP Drop Threshold",
+		150,
+		50,
+		500,
+		10,
+		"Minimum HP drop in a single frame to activate"
+	)
+
 	public readonly dismemberNode = this.entry.AddNode("Auto Dismember")
 	public readonly dismemberEnabled = this.dismemberNode.AddToggle("Enabled", true)
 

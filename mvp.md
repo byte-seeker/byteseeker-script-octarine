@@ -35,6 +35,11 @@
     - [x] Block immediate recasting using `800ms` sleep cooldowns on target routines to prevent suspicious twitches and remain undetected.
     - [x] Add dynamic configuration toggles `cancelOnImmune`, `cancelOnInvisible`, `cancelOnEul`, and `cancelOnBlink` in `config.ts` to allow users to customize cancellation behaviors.
     - [x] Implement target cyclone checks (Eul's Scepter, Wind Waker, Brewmaster Storm Cyclone) inside `runHookCancel` in `abilities.ts` under the `cancelOnEul` toggle.
+- [x] Implement Auto Meat Shield (Flesh Heap) Active Helper (2026-06-17)
+    - [x] Create configuration node and options (`meatShieldEnabled`, `meatShieldOnProjectile`, `meatShieldOnHpDrop`, `meatShieldHpThreshold`) in `config.ts`.
+    - [x] Track Pudge's HP from previous frames and add TickSleeper inside `state.ts`.
+    - [x] Implement `runAutoMeatShield` in `abilities.ts` triggering on incoming projectiles (using ProjectileManager tracking) and HP drops.
+    - [x] Integrate `runAutoMeatShield` invocation inside the PostDataUpdate hook of `index.ts`.
 
 
 

@@ -9,12 +9,14 @@ export const PudgeState = new (class {
 	public readonly farmSleeper = new TickSleeper()
 	public readonly autoKsSleeper = new TickSleeper()
 	public readonly autoHookSleeper = new TickSleeper()
+	public readonly meatShieldSleeper = new TickSleeper()
 
 	public wasRotTurnedOnByFarm = false
 	public wasRotTurnedOnByCombo = false
 
 	public lastHookTargetIndex: number | undefined
 	public lastHookCastPos: Vector3 | undefined
+	public lastMeatShieldHp: number | undefined
 
 	public readonly trackerMap = new Map<number, EnemyTracker>()
 
@@ -28,11 +30,13 @@ export const PudgeState = new (class {
 		this.farmSleeper.ResetTimer()
 		this.autoKsSleeper.ResetTimer()
 		this.dismemberSleeper.ResetTimer()
+		this.meatShieldSleeper.ResetTimer()
 
 		this.wasRotTurnedOnByFarm = false
 		this.wasRotTurnedOnByCombo = false
 		this.lastRawGameTime = 0
 		this.lastHookTargetIndex = undefined
 		this.lastHookCastPos = undefined
+		this.lastMeatShieldHp = undefined
 	}
 })()
