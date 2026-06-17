@@ -35,9 +35,9 @@ const getAssetPath = (relativePath: string): string => {
 
 export const PudgeConfig = new (class {
 	public readonly entry = Menu.AddEntry("Byteseeker", getAssetPath("icons/logo_byteseeker_no_bg60px.png"))
-		.AddNode("Hero", ImageData.GetHeroTexture("npc_dota_hero_pudge", true))
+		.AddNode("Hero", ImageData.Icons.icon_svg_alien)
 		.AddNode("Strength", ImageData.Icons.primary_attribute_strength)
-		.AddNode("Pudge", ImageData.GetHeroTexture("npc_dota_hero_pudge"))
+		.AddNode("Pudge", ImageData.GetHeroTexture("npc_dota_hero_pudge", true))
 
 	public readonly comboEnabled = this.entry.AddToggle("Enable Combo", true)
 	public readonly comboKey = this.entry.AddKeybind("Combo Key", "G", "Hold to execute combo")

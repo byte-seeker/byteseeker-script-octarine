@@ -12,7 +12,7 @@ import {
 
 class RadiusUtility {
 	private readonly entry = Menu.AddEntry("Byteseeker")
-	private readonly node = this.entry.AddNode("Utility").AddNode("Radius", ImageData.Icons.softedge_horizontal)
+	private readonly node = this.entry.AddNode("Utility").AddNode("Radius", ImageData.Icons.icon_svg_tower)
 	private readonly enabled = this.node.AddToggle("Dynamic Attack Range", true)
 	private readonly rangeStyle = this.node.AddDropdown("Style", ["Normal", "Rope"], 0)
 	private readonly color = this.node.AddColorPicker("Color", Color.Aqua.SetA(180))
