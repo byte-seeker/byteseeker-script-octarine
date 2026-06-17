@@ -281,6 +281,67 @@ export function runAutoMeatShield(hero: Hero): void {
 		}
 	}
 
+	// 3. Check Zeus ultimate
+	if (!shouldActivate && PudgeConfig.meatShieldOnZeusUlt.value) {
+		for (const enemy of EntityManager.GetEntitiesByClass(Hero)) {
+			if (
+				enemy.IsValid &&
+				enemy.IsAlive &&
+				enemy.IsEnemy(hero) &&
+				!enemy.IsIllusion &&
+				enemy.Name === "npc_dota_hero_zuus"
+			) {
+				const ult = enemy.GetAbilityByName("zuus_thundergods_wrath")
+				if (ult && ult.IsValid && ult.Level > 0 && ult.IsInAbilityPhase) {
+					shouldActivate = true
+					break
+				}
+			}
+		}
+	}
+
+	// 4. Check Lina ultimate
+	if (!shouldActivate && PudgeConfig.meatShieldOnLinaUlt.value) {
+		for (const enemy of EntityManager.GetEntitiesByClass(Hero)) {
+			if (
+				enemy.IsValid &&
+				enemy.IsAlive &&
+				enemy.IsEnemy(hero) &&
+				!enemy.IsIllusion &&
+				enemy.Name === "npc_dota_hero_lina"
+			) {
+				const ult = enemy.GetAbilityByName("lina_laguna_blade")
+				if (ult && ult.IsValid && ult.Level > 0 && ult.IsInAbilityPhase) {
+					if (hero.Distance2D(enemy) <= ult.CastRange + 100 && Math.abs(enemy.GetAngle(hero)) < 0.2) {
+						shouldActivate = true
+						break
+					}
+				}
+			}
+		}
+	}
+
+	// 5. Check Lion ultimate
+	if (!shouldActivate && PudgeConfig.meatShieldOnLionUlt.value) {
+		for (const enemy of EntityManager.GetEntitiesByClass(Hero)) {
+			if (
+				enemy.IsValid &&
+				enemy.IsAlive &&
+				enemy.IsEnemy(hero) &&
+				!enemy.IsIllusion &&
+				enemy.Name === "npc_dota_hero_lion"
+			) {
+				const ult = enemy.GetAbilityByName("lion_finger_of_death")
+				if (ult && ult.IsValid && ult.Level > 0 && ult.IsInAbilityPhase) {
+					if (hero.Distance2D(enemy) <= ult.CastRange + 100 && Math.abs(enemy.GetAngle(hero)) < 0.2) {
+						shouldActivate = true
+						break
+					}
+				}
+			}
+		}
+	}
+
 	if (shouldActivate) {
 		ExecuteOrder.PrepareOrder({
 			orderType: dotaunitorder_t.DOTA_UNIT_ORDER_CAST_NO_TARGET,

@@ -1,4 +1,4 @@
-import { Menu } from "github.com/octarine-public/wrapper/index"
+import { ImageData, Menu } from "github.com/octarine-public/wrapper/index"
 
 export const PudgeConfig = new (class {
 	public readonly entry = Menu.AddEntry("Byteseeker").AddNode("Hero").AddNode("Strength").AddNode("Pudge")
@@ -89,6 +89,27 @@ export const PudgeConfig = new (class {
 		500,
 		10,
 		"Minimum HP drop in a single frame to activate"
+	)
+	public readonly meatShieldOnZeusUlt = this.meatShieldNode.AddToggle(
+		"On Zeus Ultimate",
+		true,
+		"Activate when enemy Zeus is casting Thundergod's Wrath",
+		0,
+		ImageData.GetSpellTexture("zuus_thundergods_wrath")
+	)
+	public readonly meatShieldOnLinaUlt = this.meatShieldNode.AddToggle(
+		"On Lina Ultimate",
+		true,
+		"Activate when enemy Lina is casting Laguna Blade on Pudge",
+		0,
+		ImageData.GetSpellTexture("lina_laguna_blade")
+	)
+	public readonly meatShieldOnLionUlt = this.meatShieldNode.AddToggle(
+		"On Lion Ultimate",
+		true,
+		"Activate when enemy Lion is casting Finger of Death on Pudge",
+		0,
+		ImageData.GetSpellTexture("lion_finger_of_death")
 	)
 
 	public readonly dismemberNode = this.entry.AddNode("Auto Dismember")

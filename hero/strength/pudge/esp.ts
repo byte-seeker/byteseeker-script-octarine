@@ -12,30 +12,54 @@ import {
 import { PudgeConfig } from "./config"
 import { calcCastPos, getHookBlocker, isDirectionStable, timeToEnterRange } from "./tracker"
 
-function drawDotCircle(cx: number, cy: number, cz: number, r: number, col: Color, segs = 64): void {
-	for (let i = 0; i < segs; i++) {
-		if (i % 2 !== 0) {
+function drawWorldCircle(
+	cx: number,
+	cy: number,
+	cz: number,
+	r: number,
+	col: Color,
+	thickness = 2,
+	segs = 32,
+	dashed = false
+): void {
+	let lastPos: Vector2 | null = null
+	for (let i = 0; i <= segs; i++) {
+		if (dashed && i % 2 !== 0) {
+			lastPos = null
 			continue
 		}
 		const a = (i / segs) * Math.PI * 2
-		const sp = RendererSDK.WorldToScreen(new Vector3(cx + Math.cos(a) * r, cy + Math.sin(a) * r, cz))
+		const wp = new Vector3(cx + Math.cos(a) * r, cy + Math.sin(a) * r, cz)
+		// @ts-ignore
+		const sp = RendererSDK.WorldToScreen(wp) as Vector2 | null
 		if (sp !== null && sp !== undefined) {
-			RendererSDK.FilledCircle(sp, new Vector2(3, 3), col)
+			if (lastPos !== null) {
+				RendererSDK.Line(lastPos, sp, col, thickness)
+			}
+			lastPos = sp
+		} else {
+			lastPos = null
 		}
 	}
 }
 
-function drawLine(a: Vector2, b: Vector2, col: Color): void {
+function drawDashedLine(a: Vector2, b: Vector2, col: Color, dashLen = 8, gapLen = 6, thickness = 2): void {
 	const dx = b.x - a.x
 	const dy = b.y - a.y
 	const len = Math.sqrt(dx * dx + dy * dy)
 	if (len < 1) {
 		return
 	}
-	const steps = Math.ceil(len / 5)
-	for (let i = 0; i <= steps; i++) {
-		const f = i / steps
-		RendererSDK.FilledCircle(new Vector2(a.x + dx * f, a.y + dy * f), new Vector2(2, 2), col)
+	const step = dashLen + gapLen
+	const numDashes = Math.ceil(len / step)
+
+	for (let i = 0; i < numDashes; i++) {
+		const startPct = (i * step) / len
+		const endPct = Math.min(1, (i * step + dashLen) / len)
+
+		const p1 = new Vector2(a.x + dx * startPct, a.y + dy * startPct)
+		const p2 = new Vector2(a.x + dx * endPct, a.y + dy * endPct)
+		RendererSDK.Line(p1, p2, col, thickness)
 	}
 }
 
@@ -61,7 +85,7 @@ export function drawEsp(): void {
 	if (PudgeConfig.espRangeCircle.value) {
 		const p = hero.Position
 		const col = hookReady ? Color.Aqua.SetA(180) : Color.Gray.SetA(100)
-		drawDotCircle(p.x, p.y, p.z, hookRange, col)
+		drawWorldCircle(p.x, p.y, p.z, hookRange, col, 2, 64, true)
 	}
 
 	for (const en of EntityManager.GetEntitiesByClass(Hero)) {
@@ -118,22 +142,37 @@ export function drawEsp(): void {
 			if (hs !== null && cs !== null) {
 				const blocker =
 					hook && PudgeConfig.espShowBlockers.value ? getHookBlocker(hero, en, cast, hook) : undefined
-				const col = blocker ? Color.Red.SetA(220) : stable ? Color.Aqua.SetA(220) : Color.Red.SetA(220)
-				drawLine(hs, cs, col)
 
-				const circleSize = new Vector2(14, 14)
-				RendererSDK.OutlinedCircle(cs.Subtract(circleSize.DivideScalar(2)), circleSize, col, 2)
+				let col: Color
+				if (blocker) {
+					col = new Color(255, 50, 50, 220) // Crimson Red for blocked
+				} else if (!stable) {
+					col = new Color(255, 140, 0, 220) // Orange for unstable target direction
+				} else {
+					col = new Color(57, 255, 20, 220) // Neon Green for perfect opportunity
+				}
+
+				drawDashedLine(hs, cs, col, 8, 6, 2)
+
+				// Draw 3D world circle at the predicted landing point representing hook's actual collision radius
+				const hookRadius = hook ? hook.GetBaseAOERadiusForLevel(hook.Level) : 100
+				drawWorldCircle(cast.x, cast.y, cast.z, hookRadius, col, 2, 32, false)
 
 				if (blocker) {
 					// @ts-ignore
 					const blockerPos = RendererSDK.WorldToScreen(blocker.Position) as Vector2 | null
 					if (blockerPos !== null && blockerPos !== undefined) {
-						const blockerSize = new Vector2(30, 30)
-						RendererSDK.OutlinedCircle(
-							blockerPos.Subtract(blockerSize.DivideScalar(2)),
-							blockerSize,
-							Color.Red,
-							2
+						// Draw 3D world circle around the blocker using its real HullRadius
+						const blockerRadius = blocker.HullRadius || 30
+						drawWorldCircle(
+							blocker.Position.x,
+							blocker.Position.y,
+							blocker.Position.z,
+							blockerRadius,
+							new Color(255, 50, 50, 225),
+							2,
+							32,
+							false
 						)
 
 						const font = "PTSans"

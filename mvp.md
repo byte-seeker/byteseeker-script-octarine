@@ -36,16 +36,17 @@
     - [x] Add dynamic configuration toggles `cancelOnImmune`, `cancelOnInvisible`, `cancelOnEul`, and `cancelOnBlink` in `config.ts` to allow users to customize cancellation behaviors.
     - [x] Implement target cyclone checks (Eul's Scepter, Wind Waker, Brewmaster Storm Cyclone) inside `runHookCancel` in `abilities.ts` under the `cancelOnEul` toggle.
 - [x] Implement Auto Meat Shield (Flesh Heap) Active Helper (2026-06-17)
-    - [x] Create configuration node and options (`meatShieldEnabled`, `meatShieldOnProjectile`, `meatShieldOnHpDrop`, `meatShieldHpThreshold`) in `config.ts`.
+    - [x] Create configuration node and options (`meatShieldEnabled`, `meatShieldOnProjectile`, `meatShieldOnHpDrop`, `meatShieldHpThreshold`, `meatShieldOnZeusUlt`) in `config.ts`.
     - [x] Track Pudge's HP from previous frames and add TickSleeper inside `state.ts`.
-    - [x] Implement `runAutoMeatShield` in `abilities.ts` triggering on incoming projectiles (using ProjectileManager tracking) and HP drops.
+    - [x] Implement `runAutoMeatShield` in `abilities.ts` triggering on incoming projectiles, HP drops, and enemy Zeus casting Thundergod's Wrath.
     - [x] Integrate `runAutoMeatShield` invocation inside the PostDataUpdate hook of `index.ts`.
 - [x] Implement Enhanced ESP: Blocker Highlights & Predicted Intercept (2026-06-17)
     - [x] Add configuration option `espShowBlockers` in `config.ts`.
     - [x] Implement `getHookBlocker` in `tracker.ts` returning the creep or hero entity blocking the trajectory.
-    - [x] Update trajectory line rendering in `esp.ts` to show in red if blocked.
-    - [x] Add red circles and "BLOCKER" text overlay above blocking entities.
-    - [x] Add predicted target intercept ring (outlined circle) at the endpoint.
+    - [x] Implement premium 3D world projection circle drawing connecting points via lines.
+    - [x] Render hook prediction target intercept ring as a 3D ground circle scaled to hook's real level collision radius.
+    - [x] Render blocker highlight as a 3D red ground circle scaled to blocker's actual hull radius.
+    - [x] Update trajectory line to a premium dashed line with color-coding: Neon Green (stable & clear), Orange (unstable & clear), Crimson Red (blocked).
 
 
 
