@@ -1,8 +1,3 @@
-//import "./auto_ban"
-//import "./last_hit"
-//import "./armlet_abuse"
-//import "./anti_initiation"
-//import "./auto_save"
 import "./radius"
 import "./counter_items"
 import "./hero/strength/pudge/index"
