@@ -24,6 +24,8 @@
     - [x] Remove hardcoded `hookCollisionRadius` slider from Pudge Hook settings in `config.ts`.
     - [x] Refactor `isHookBlocked` signature in `tracker.ts` to accept the hook ability directly, and update calls in `abilities.ts`, `auto_ks.ts`, and `auto_hook.ts` to pass the hook object, keeping the arguments clean and following DRY.
     - [x] Update Hook Stability description text from 0.3s to 0.45s in `config.ts` to align with the actual `STABILITY_WINDOW`.
+    - [x] Fix ESP hook trajectory line to draw whenever the target is in range, rather than only when holding the combo hotkey.
+
 
 
 
