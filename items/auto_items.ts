@@ -16,7 +16,7 @@ class AutoItemsUtility {
 	private readonly entry = Menu.AddEntry("Byteseeker")
 	private readonly node = this.entry
 		.AddNode("Utility", ImageData.Icons.icon_settings)
-		.AddNode("Auto Items", ImageData.Icons.icon_ward)
+		.AddNode("Auto Items", ImageData.Icons.icon_damage)
 	private readonly enabled = this.node.AddToggle("Enabled", true)
 
 	private readonly itemsSelector: Menu.DynamicImageSelector
