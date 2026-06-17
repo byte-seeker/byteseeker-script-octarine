@@ -7,6 +7,7 @@ import {
 	LocalPlayer
 } from "github.com/octarine-public/wrapper/index"
 
+import { runHookCancel } from "./abilities"
 import { runAutoFarm } from "./auto_farm"
 import { runAutoHook } from "./auto_hook"
 import { runAutoKillSteal } from "./auto_ks"
@@ -59,6 +60,7 @@ new (class PudgeModule {
 			}
 		}
 
+		runHookCancel(hero)
 		runAutoFarm(hero)
 		runAutoHook(hero)
 		runAutoKillSteal(hero)

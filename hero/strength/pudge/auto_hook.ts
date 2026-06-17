@@ -76,5 +76,7 @@ export function runAutoHook(hero: Hero): void {
 		showEffects: true,
 		isPlayerInput: false
 	})
+	PudgeState.lastHookTargetIndex = best.Index
+	PudgeState.lastHookCastPos = pos
 	PudgeState.autoHookSleeper.Sleep(GameState.InputLag * 1000 + hook.CastPoint * 1000 + 300)
 }

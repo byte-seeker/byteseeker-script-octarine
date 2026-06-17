@@ -1,4 +1,11 @@
-import { dotaunitorder_t, ExecuteOrder, GameState, Hero, pudge_rot } from "github.com/octarine-public/wrapper/index"
+import {
+	dotaunitorder_t,
+	EntityManager,
+	ExecuteOrder,
+	GameState,
+	Hero,
+	pudge_rot
+} from "github.com/octarine-public/wrapper/index"
 
 import { PudgeConfig } from "./config"
 import { PudgeState } from "./state"
@@ -62,6 +69,8 @@ export function castHook(hero: Hero, target: Hero): boolean {
 		showEffects: true,
 		isPlayerInput: false
 	})
+	PudgeState.lastHookTargetIndex = target.Index
+	PudgeState.lastHookCastPos = pos
 	PudgeState.sleeper.Sleep(GameState.InputLag * 1000 + hook.CastPoint * 1000 + 150)
 	return true
 }
@@ -139,4 +148,86 @@ export function castDismember(hero: Hero, target: Hero): boolean {
 	})
 	PudgeState.sleeper.Sleep(GameState.InputLag * 1000 + dis.CastPoint * 1000 + 200)
 	return true
+}
+
+export function cancelHook(hero: Hero): void {
+	ExecuteOrder.PrepareOrder({
+		orderType: dotaunitorder_t.DOTA_UNIT_ORDER_STOP,
+		issuers: [hero],
+		queue: false,
+		showEffects: false,
+		isPlayerInput: false
+	})
+	PudgeState.sleeper.Sleep(800)
+	PudgeState.autoKsSleeper.Sleep(800)
+	PudgeState.autoHookSleeper.Sleep(800)
+	PudgeState.lastHookTargetIndex = undefined
+	PudgeState.lastHookCastPos = undefined
+}
+
+export function runHookCancel(hero: Hero): void {
+	if (!PudgeConfig.cancelEnabled.value) {
+		return
+	}
+	const hook = hero.GetAbilityByName("pudge_meat_hook")
+	if (!hook || !hook.IsValid || hook.Level <= 0) {
+		return
+	}
+
+	if (!hook.IsInAbilityPhase) {
+		PudgeState.lastHookTargetIndex = undefined
+		PudgeState.lastHookCastPos = undefined
+		return
+	}
+
+	const targetIndex = PudgeState.lastHookTargetIndex
+	if (targetIndex === undefined) {
+		return
+	}
+
+	const target = EntityManager.EntityByIndex(targetIndex)
+	if (!target || !(target instanceof Hero) || !target.IsValid || !target.IsAlive) {
+		cancelHook(hero)
+		return
+	}
+
+	if (PudgeConfig.cancelOnImmune.value && (target.IsMagicImmune || target.IsDebuffImmune)) {
+		cancelHook(hero)
+		return
+	}
+
+	if (PudgeConfig.cancelOnInvisible.value && !target.IsVisible) {
+		cancelHook(hero)
+		return
+	}
+
+	if (PudgeConfig.cancelOnEul.value) {
+		const isCycloned = target.Buffs.some(
+			(b: any) =>
+				b.Name === "modifier_eul_cyclone" ||
+				b.Name === "modifier_wind_waker" ||
+				b.Name === "modifier_brewmaster_storm_cyclone"
+		)
+		if (isCycloned) {
+			cancelHook(hero)
+			return
+		}
+	}
+
+	if (PudgeConfig.cancelOnBlink.value) {
+		const hookRange = hook.CastRange > 0 ? hook.CastRange : 1300
+		const newCastPos = calcCastPos(hero, target, hookRange)
+		if (PudgeState.lastHookCastPos && newCastPos.Distance2D(PudgeState.lastHookCastPos) > 300) {
+			cancelHook(hero)
+			return
+		}
+	}
+
+	if (
+		PudgeConfig.collisionCheck.value &&
+		PudgeState.lastHookCastPos &&
+		isHookBlocked(hero, target, PudgeState.lastHookCastPos, hook)
+	) {
+		cancelHook(hero)
+	}
 }

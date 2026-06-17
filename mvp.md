@@ -27,6 +27,17 @@
 
     - [x] Update Hook Stability description text from 0.3s to 0.45s in `config.ts` to align with the actual `STABILITY_WINDOW`.
     - [x] Fix ESP hook trajectory line to draw whenever the target is in range, rather than only when holding the combo hotkey.
+- [x] Implement Smart Hook Cancel / Anti-Waste Hook feature (2026-06-17)
+    - [x] Add toggle option `cancelEnabled` in Pudge Hook settings in `config.ts`.
+    - [x] Add properties `lastHookTargetIndex` and `lastHookCastPos` to `PudgeState` inside `state.ts`.
+    - [x] Save active hook target & cast position on all cast Hook triggers (`castHook`, `runAutoKillSteal`, `runAutoHook`).
+    - [x] Implement cancellation evaluator `runHookCancel` & trigger `cancelHook` inside `abilities.ts` checking target state, visibility, magic immunity, blink distance shift, and paths blocking.
+    - [x] Block immediate recasting using `800ms` sleep cooldowns on target routines to prevent suspicious twitches and remain undetected.
+    - [x] Add dynamic configuration toggles `cancelOnImmune`, `cancelOnInvisible`, `cancelOnEul`, and `cancelOnBlink` in `config.ts` to allow users to customize cancellation behaviors.
+    - [x] Implement target cyclone checks (Eul's Scepter, Wind Waker, Brewmaster Storm Cyclone) inside `runHookCancel` in `abilities.ts` under the `cancelOnEul` toggle.
+
+
+
 
 
 

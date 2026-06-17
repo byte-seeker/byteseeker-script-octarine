@@ -52,6 +52,8 @@ export function runAutoKillSteal(hero: Hero): void {
 				showEffects: true,
 				isPlayerInput: false
 			})
+			PudgeState.lastHookTargetIndex = en.Index
+			PudgeState.lastHookCastPos = pos
 			PudgeState.autoKsSleeper.Sleep(GameState.InputLag * 1000 + hook.CastPoint * 1000 + 150)
 			break
 		}

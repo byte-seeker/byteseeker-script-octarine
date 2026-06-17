@@ -25,6 +25,31 @@ export const PudgeConfig = new (class {
 		true,
 		"Observe 0.45s enemy movement before firing hook"
 	)
+	public readonly cancelEnabled = this.hookNode.AddToggle(
+		"Smart Hook Cancel",
+		true,
+		"Cancel hook if target blinks, goes invisible, becomes immune, or is blocked during cast windup"
+	)
+	public readonly cancelOnImmune = this.hookNode.AddToggle(
+		"Cancel on Magic/Debuff Immune",
+		false,
+		"Cancel hook if target becomes spell/debuff immune during cast windup"
+	)
+	public readonly cancelOnInvisible = this.hookNode.AddToggle(
+		"Cancel on Invisible/Fog",
+		false,
+		"Cancel hook if target goes invisible or enters Fog of War during cast windup"
+	)
+	public readonly cancelOnEul = this.hookNode.AddToggle(
+		"Cancel on Eul/Cyclone",
+		true,
+		"Cancel hook if target is cycloned (Eul/Windwaker) during cast windup"
+	)
+	public readonly cancelOnBlink = this.hookNode.AddToggle(
+		"Cancel on Blink/Teleport",
+		true,
+		"Cancel hook if target blinks or teleports during cast windup"
+	)
 	public readonly autoKsEnabled = this.hookNode.AddToggle(
 		"Auto KS with Hook",
 		true,

@@ -1,4 +1,4 @@
-import { TickSleeper } from "github.com/octarine-public/wrapper/index"
+import { TickSleeper, Vector3 } from "github.com/octarine-public/wrapper/index"
 
 import { EnemyTracker } from "./types"
 
@@ -12,6 +12,9 @@ export const PudgeState = new (class {
 
 	public wasRotTurnedOnByFarm = false
 	public wasRotTurnedOnByCombo = false
+
+	public lastHookTargetIndex: number | undefined
+	public lastHookCastPos: Vector3 | undefined
 
 	public readonly trackerMap = new Map<number, EnemyTracker>()
 
@@ -29,5 +32,7 @@ export const PudgeState = new (class {
 		this.wasRotTurnedOnByFarm = false
 		this.wasRotTurnedOnByCombo = false
 		this.lastRawGameTime = 0
+		this.lastHookTargetIndex = undefined
+		this.lastHookCastPos = undefined
 	}
 })()
