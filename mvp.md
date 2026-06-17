@@ -75,4 +75,11 @@
     - [x] Add `ImageData.Icons.icon_analytics` to the Counter Items Information menu node.
     - [x] Add `ImageData.GetItemTexture("item_dragon_lance")` to the Radius menu node.
 
+## Investigation Notes
+- **Zeus Ultimate Detection in Fog of War (2026-06-17)**:
+    - Analyzed why `item_cyclone` in `auto_items.ts` only works when Zeus is visible on the map.
+    - **Reason**: When Zeus is in the fog of war (not visible), the Dota 2 server does not replicate his cast states to the client. Thus, `IsInAbilityPhase` remains `false`.
+    - **Why it seems to work in `abilities.ts`**: Pudge's Flesh Heap (`abilities.ts`) has a secondary trigger `meatShieldOnHpDrop`. When Zeus's ultimate hits and deals damage, the instant HP drop triggers Flesh Heap immediately *after* the damage is dealt, giving the illusion that the cast was predicted. Since Eul's Scepter requires pre-cast activation to dodge the damage, it cannot rely on post-damage HP drop triggers, meaning it cannot activate when Zeus casts from the fog.
+
+
 
