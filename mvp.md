@@ -47,13 +47,9 @@
     - [x] Render hook prediction target intercept ring as a 3D ground circle scaled to hook's real level collision radius.
     - [x] Render blocker highlight as a 3D red ground circle scaled to blocker's actual hull radius.
     - [x] Update trajectory line to a premium dashed line with color-coding: Neon Green (stable & clear), Orange (unstable & clear), Crimson Red (blocked).
-
-
-
-
-
-
-
-
-
+- [x] Implement Auto Item Activation feature (2026-06-17)
+    - [x] Create configuration node and options for Eul/Wind Waker, BKB, Lotus, Blade Mail, Glimmer, and Pipe in `items/auto_items.ts`.
+    - [x] Implement dynamic logic to monitor enemy ultimate casts (Zeus, Lina, Lion) and incoming targeted spell projectiles.
+    - [x] Cast appropriate items using custom latency buffers and sleep durations to remain undetected.
+    - [x] Add auto_items import in `index.ts`.
 
