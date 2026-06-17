@@ -8,6 +8,7 @@ import {
 	pudge_rot
 } from "github.com/octarine-public/wrapper/index"
 
+import { isZeusUltParticleActive } from "../../../items/zeus_ult_tracker"
 import { PudgeConfig } from "./config"
 import { PudgeState } from "./state"
 import { calcCastPos, isDirectionStable, isHookBlocked } from "./tracker"
@@ -283,6 +284,7 @@ export function runAutoMeatShield(hero: Hero): void {
 
 	// 3. Check Zeus ultimate
 	if (!shouldActivate && PudgeConfig.meatShieldTriggers.IsEnabled("zuus_thundergods_wrath")) {
+		// Primary: IsInAbilityPhase (only works when Zeus is visible)
 		for (const enemy of EntityManager.GetEntitiesByClass(Hero)) {
 			if (
 				enemy.IsValid &&
@@ -297,6 +299,12 @@ export function runAutoMeatShield(hero: Hero): void {
 					break
 				}
 			}
+		}
+
+		// Fallback: particle-based detection works even when Zeus is in fog of war.
+		// zuus_thundergods_wrath_start.vpcf is world-replicated to all clients.
+		if (!shouldActivate && isZeusUltParticleActive()) {
+			shouldActivate = true
 		}
 	}
 

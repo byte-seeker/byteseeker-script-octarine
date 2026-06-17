@@ -12,6 +12,8 @@ import {
 	TickSleeper
 } from "github.com/octarine-public/wrapper/index"
 
+import { isZeusUltParticleActive } from "./zeus_ult_tracker"
+
 class AutoItemsUtility {
 	private readonly entry = Menu.AddEntry("Byteseeker")
 	private readonly node = this.entry
@@ -185,6 +187,7 @@ class AutoItemsUtility {
 			(this.itemsSelector.IsEnabled("item_pipe") && this.pipeTriggers.IsEnabled("zuus_thundergods_wrath"))
 
 		if (checkZeus) {
+			// Primary: check IsInAbilityPhase (only works when Zeus is visible)
 			for (const enemy of EntityManager.GetEntitiesByClass(Hero)) {
 				if (
 					enemy.IsValid &&
@@ -199,6 +202,12 @@ class AutoItemsUtility {
 						break
 					}
 				}
+			}
+
+			// Fallback: particle-based detection works even when Zeus is in fog of war.
+			// zuus_thundergods_wrath_start.vpcf is world-replicated to all clients.
+			if (!triggerZeus && isZeusUltParticleActive()) {
+				triggerZeus = true
 			}
 		}
 
