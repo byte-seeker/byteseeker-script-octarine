@@ -12,7 +12,7 @@ import {
 	TickSleeper
 } from "github.com/octarine-public/wrapper/index"
 
-import { isZeusUltParticleActive } from "./zeus_ult_tracker"
+import { isZeusUltParticleActive } from "../utility/particle_tracker"
 
 class AutoItemsUtility {
 	private readonly entry = Menu.AddEntry("Byteseeker")

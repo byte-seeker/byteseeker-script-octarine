@@ -8,7 +8,7 @@ import {
 	pudge_rot
 } from "github.com/octarine-public/wrapper/index"
 
-import { isZeusUltParticleActive } from "../../../items/zeus_ult_tracker"
+import { isZeusUltParticleActive } from "../../../utility/particle_tracker"
 import { PudgeConfig } from "./config"
 import { PudgeState } from "./state"
 import { calcCastPos, isDirectionStable, isHookBlocked } from "./tracker"

@@ -74,12 +74,18 @@
 - [x] Add icon image to Counter Items Information & Radius nodes (2026-06-17)
     - [x] Add `ImageData.Icons.icon_analytics` to the Counter Items Information menu node.
     - [x] Add `ImageData.GetItemTexture("item_dragon_lance")` to the Radius menu node.
+- [x] Fix Zeus ult detection in fog of war for Auto Items & Auto Meat Shield (2026-06-17)
+    - [x] Create `items/zeus_ult_tracker.ts` with generic `createEnemyParticleTracker(particlePathSubstring, reactWindowSeconds?)` factory.
+        - Registers a `ParticleCreated` listener for any world-replicated particle substring.
+        - Enemy validation: if `par.Source` is available checks `IsEnemy && !IsIllusion`; if source is undefined (caster in fog) trusts the particle name since it maps 1-to-1 with the ability.
+        - Returns a `() => boolean` checker — call per-frame to test if particle was detected within the react window.
+        - Auto-resets `detectedTime` on `GameEnded`.
+    - [x] Export `isZeusUltParticleActive` as a pre-configured instance watching `zuus_thundergods_wrath_start.vpcf`.
+    - [x] Update `items/auto_items.ts`: Zeus `triggerZeus` now `IsInAbilityPhase || isZeusUltParticleActive()`.
+    - [x] Update `hero/strength/pudge/abilities.ts`: `runAutoMeatShield` Zeus check now `IsInAbilityPhase || isZeusUltParticleActive()`.
 
 ## Investigation Notes
 - **Zeus Ultimate Detection in Fog of War (2026-06-17)**:
-    - Analyzed why `item_cyclone` in `auto_items.ts` only works when Zeus is visible on the map.
-    - **Reason**: When Zeus is in the fog of war (not visible), the Dota 2 server does not replicate his cast states to the client. Thus, `IsInAbilityPhase` remains `false`.
-    - **Why it seems to work in `abilities.ts`**: Pudge's Flesh Heap (`abilities.ts`) has a secondary trigger `meatShieldOnHpDrop`. When Zeus's ultimate hits and deals damage, the instant HP drop triggers Flesh Heap immediately *after* the damage is dealt, giving the illusion that the cast was predicted. Since Eul's Scepter requires pre-cast activation to dodge the damage, it cannot rely on post-damage HP drop triggers, meaning it cannot activate when Zeus casts from the fog.
-
-
-
+    - **Root cause**: `IsInAbilityPhase` is only replicated when Zeus is visible. In fog, it stays `false`.
+    - **Solution**: `zuus_thundergods_wrath_start.vpcf` is listed in `network_particles.json` with `attach: 1, source.isAttachedTo: true`, meaning it is world-replicated to all clients at cast time — regardless of Zeus visibility.
+    - **Generic utility**: `createEnemyParticleTracker` in `items/zeus_ult_tracker.ts` can be reused for any world-replicated enemy ability particle with a single line of setup.
