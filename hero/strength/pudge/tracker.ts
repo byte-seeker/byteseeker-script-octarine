@@ -249,3 +249,33 @@ export function isHookBlocked(hero: Hero, target: Hero, castPos: Vector3, hook: 
 
 	return false
 }
+
+export function getHookBlocker(hero: Hero, target: Hero, castPos: Vector3, hook: Ability): Creep | Hero | undefined {
+	const hpos = hero.Position
+	const radius = hook.GetBaseAOERadiusForLevel(hook.Level)
+	const r2 = radius * radius
+
+	for (const creep of EntityManager.GetEntitiesByClass(Creep)) {
+		if (!creep.IsValid || !creep.IsAlive || !creep.IsVisible) {
+			continue
+		}
+		const cpos = creep.Position
+		const d2 = distToSegmentSquared(cpos.x, cpos.y, hpos.x, hpos.y, castPos.x, castPos.y)
+		if (d2 <= r2) {
+			return creep
+		}
+	}
+
+	for (const en of EntityManager.GetEntitiesByClass(Hero)) {
+		if (!en.IsValid || !en.IsAlive || !en.IsVisible || en.Index === hero.Index || en.Index === target.Index) {
+			continue
+		}
+		const epos = en.Position
+		const d2 = distToSegmentSquared(epos.x, epos.y, hpos.x, hpos.y, castPos.x, castPos.y)
+		if (d2 <= r2) {
+			return en
+		}
+	}
+
+	return undefined
+}

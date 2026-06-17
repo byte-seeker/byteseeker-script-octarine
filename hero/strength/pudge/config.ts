@@ -127,6 +127,11 @@ export const PudgeConfig = new (class {
 	public readonly espHookLine = this.espNode.AddToggle("Show Hook Trajectory", true)
 	public readonly espRangeLabel = this.espNode.AddToggle("Show Range Labels", true)
 	public readonly espApproachSec = this.espNode.AddSlider("Approach Warning (sec)", 2, 1, 5, 1)
+	public readonly espShowBlockers = this.espNode.AddToggle(
+		"Highlight Blockers",
+		true,
+		"Highlight creeps or heroes blocking the hook trajectory in red"
+	)
 
 	public comboSequenceGrid: any
 

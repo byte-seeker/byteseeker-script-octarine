@@ -10,7 +10,7 @@ import {
 } from "github.com/octarine-public/wrapper/index"
 
 import { PudgeConfig } from "./config"
-import { calcCastPos, isDirectionStable, timeToEnterRange } from "./tracker"
+import { calcCastPos, getHookBlocker, isDirectionStable, timeToEnterRange } from "./tracker"
 
 function drawDotCircle(cx: number, cy: number, cz: number, r: number, col: Color, segs = 64): void {
 	for (let i = 0; i < segs; i++) {
@@ -116,9 +116,39 @@ export function drawEsp(): void {
 			// @ts-ignore
 			const cs = RendererSDK.WorldToScreen(new Vector3(cast.x, cast.y, cast.z)) as Vector2 | null
 			if (hs !== null && cs !== null) {
-				const col = stable ? Color.Aqua.SetA(220) : Color.Red.SetA(220)
+				const blocker =
+					hook && PudgeConfig.espShowBlockers.value ? getHookBlocker(hero, en, cast, hook) : undefined
+				const col = blocker ? Color.Red.SetA(220) : stable ? Color.Aqua.SetA(220) : Color.Red.SetA(220)
 				drawLine(hs, cs, col)
-				RendererSDK.FilledCircle(cs, new Vector2(7, 7), col)
+
+				const circleSize = new Vector2(14, 14)
+				RendererSDK.OutlinedCircle(cs.Subtract(circleSize.DivideScalar(2)), circleSize, col, 2)
+
+				if (blocker) {
+					// @ts-ignore
+					const blockerPos = RendererSDK.WorldToScreen(blocker.Position) as Vector2 | null
+					if (blockerPos !== null && blockerPos !== undefined) {
+						const blockerSize = new Vector2(30, 30)
+						RendererSDK.OutlinedCircle(
+							blockerPos.Subtract(blockerSize.DivideScalar(2)),
+							blockerSize,
+							Color.Red,
+							2
+						)
+
+						const font = "PTSans"
+						const label = "BLOCKER"
+						const labelSize = RendererSDK.GetTextSize(label, font, 9, 600, false)
+						const labelPos = new Vector2(blockerPos.x - labelSize.x / 2, blockerPos.y - 30)
+
+						RendererSDK.FilledRect(
+							new Vector2(labelPos.x - 3, labelPos.y - 1),
+							new Vector2(labelSize.x + 6, labelSize.y + 2),
+							Color.Black.SetA(160)
+						)
+						RendererSDK.Text(label, labelPos, Color.Red, font, 9, 600, false, true)
+					}
+				}
 			}
 		}
 	}
