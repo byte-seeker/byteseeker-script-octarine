@@ -40,6 +40,13 @@
     - [x] Track Pudge's HP from previous frames and add TickSleeper inside `state.ts`.
     - [x] Implement `runAutoMeatShield` in `abilities.ts` triggering on incoming projectiles (using ProjectileManager tracking) and HP drops.
     - [x] Integrate `runAutoMeatShield` invocation inside the PostDataUpdate hook of `index.ts`.
+- [x] Implement Enhanced ESP: Blocker Highlights & Predicted Intercept (2026-06-17)
+    - [x] Add configuration option `espShowBlockers` in `config.ts`.
+    - [x] Implement `getHookBlocker` in `tracker.ts` returning the creep or hero entity blocking the trajectory.
+    - [x] Update trajectory line rendering in `esp.ts` to show in red if blocked.
+    - [x] Add red circles and "BLOCKER" text overlay above blocking entities.
+    - [x] Add predicted target intercept ring (outlined circle) at the endpoint.
+
 
 
 
