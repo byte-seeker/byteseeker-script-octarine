@@ -63,6 +63,12 @@
 - [x] Add user-friendly tooltip explanation to Auto Hook (Background) node (2026-06-17)
     - [x] Configure a descriptive tooltip explaining that the script automatically hooks vulnerable, channeled, or stable targets in the background.
 - [x] Configure custom logo for Byteseeker root entry (2026-06-17)
-    - [x] Copy custom logo `logo_byteseeker_no_bg60px.png` to `scripts_files/icons/` to match standard asset layout.
-    - [x] Implement dynamic `getAssetPath` stack-based directory traversal to find the root folder path at runtime.
+    - [x] Create `scripts_files/icons/` subdirectory and copy the custom logo `logo_byteseeker_no_bg60px.png` there to match standard asset layout structure.
+    - [x] Implement dynamic `getAssetPath` stack-based directory traversal to find the root folder path at runtime, fixing it to run `fexists` check on the file level instead of the directory level.
+    - [x] Convert local absolute paths to the online repository prefix `"github.com/byte-seeker/byteseeker-script-octarine/"` dynamically in `getAssetPath` to ensure asset portability for remote users.
     - [x] Update `Menu.AddEntry("Byteseeker")` to `Menu.AddEntry("Byteseeker", getAssetPath("icons/logo_byteseeker_no_bg60px.png"))` so that it resolves to a valid absolute path regardless of installation folder.
+
+
+- [x] Fix Hero node icon path (2026-06-17)
+    - [x] Replace invalid raw path `"panorama/images/hud/reborn/icon_hero_psd.vtex_c"` with dynamic `ImageData.GetHeroTexture("npc_dota_hero_pudge", true)` which returns the correct small hero texture.
+

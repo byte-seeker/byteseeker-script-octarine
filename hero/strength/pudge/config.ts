@@ -2,31 +2,40 @@ import { ImageData, Menu } from "github.com/octarine-public/wrapper/index"
 
 const getAssetPath = (relativePath: string): string => {
 	const stack = new Error().stack
+	const fallback = `github.com/byte-seeker/byteseeker-script-octarine/scripts_files/${relativePath}`
 	if (!stack) {
-		return relativePath
+		return fallback
 	}
 	const lines = stack.split("\n")
 	const callerLine = lines[2] || ""
 	const match = /^\s{4}at\s(?:.+\s\()?(.+):\d+:\d+(?:\))?$/.exec(callerLine)
 	if (!match) {
-		return relativePath
+		return fallback
 	}
 	const callerFile = match[1].replace(/\\/g, "/")
 	const parts = callerFile.split("/")
 	parts.pop() // remove filename
 	while (parts.length > 0) {
-		const checkPath = `${parts.join("/")}/scripts_files`
+		const checkPath = `${parts.join("/")}/scripts_files/${relativePath}`
 		if (fexists(checkPath)) {
-			return `${checkPath}/${relativePath}`
+			const githubIdx = checkPath.indexOf("github.com/")
+			if (githubIdx !== -1) {
+				return checkPath.substring(githubIdx)
+			}
+			const repoIdx = checkPath.indexOf("byteseeker-script-octarine/scripts_files/")
+			if (repoIdx !== -1) {
+				return `github.com/byte-seeker/${checkPath.substring(repoIdx)}`
+			}
+			return checkPath
 		}
 		parts.pop()
 	}
-	return relativePath
+	return fallback
 }
 
 export const PudgeConfig = new (class {
 	public readonly entry = Menu.AddEntry("Byteseeker", getAssetPath("icons/logo_byteseeker_no_bg60px.png"))
-		.AddNode("Hero", "panorama/images/hud/reborn/icon_hero_psd.vtex_c")
+		.AddNode("Hero", ImageData.GetHeroTexture("npc_dota_hero_pudge", true))
 		.AddNode("Strength", ImageData.Icons.primary_attribute_strength)
 		.AddNode("Pudge", ImageData.GetHeroTexture("npc_dota_hero_pudge"))
 
@@ -93,7 +102,10 @@ export const PudgeConfig = new (class {
 
 	public readonly rotEnabled = this.entry.AddToggle("Auto Rot", true)
 
-	public readonly meatShieldNode = this.entry.AddNode("Auto Meat Shield")
+	public readonly meatShieldNode = this.entry.AddNode(
+		"Auto Meat Shield",
+		ImageData.GetSpellTexture("pudge_flesh_heap")
+	)
 	public readonly meatShieldEnabled = this.meatShieldNode.AddToggle(
 		"Enabled",
 		true,
@@ -119,7 +131,7 @@ export const PudgeConfig = new (class {
 	)
 	public meatShieldTriggers!: Menu.DynamicImageSelector
 
-	public readonly dismemberNode = this.entry.AddNode("Auto Dismember")
+	public readonly dismemberNode = this.entry.AddNode("Auto Dismember", ImageData.GetSpellTexture("pudge_dismember"))
 	public readonly dismemberEnabled = this.dismemberNode.AddToggle("Enabled", true)
 
 	public readonly autoHookNode = this.entry.AddNode(
@@ -130,7 +142,7 @@ export const PudgeConfig = new (class {
 	public readonly autoHookEnabled = this.autoHookNode.AddToggle("Enabled", false)
 	public readonly autoHookMinDist = this.autoHookNode.AddSlider("Min Distance", 200, 0, 600)
 
-	public readonly farmNode = this.entry.AddNode("Auto Farm (Rot)")
+	public readonly farmNode = this.entry.AddNode("Auto Farm (Rot)", ImageData.GetSpellTexture("pudge_rot"))
 	public readonly farmEnabled = this.farmNode.AddToggle("Enabled", false, "Auto toggle Rot to farm nearby creeps")
 	public readonly farmSafeHpPct = this.farmNode.AddSlider(
 		"Safe HP %",
