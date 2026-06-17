@@ -109,8 +109,7 @@ export function drawEsp(): void {
 			RendererSDK.Text(label, tp, col, font, 11, 700, false, true)
 		}
 
-		// @ts-ignore
-		if (PudgeConfig.espHookLine.value && PudgeConfig.comboKey.isPressed && inRange) {
+		if (PudgeConfig.espHookLine.value && inRange) {
 			const cast = calcCastPos(hero, en, hookRange)
 			// @ts-ignore
 			const hs = RendererSDK.WorldToScreen(hero.Position) as Vector2 | null
