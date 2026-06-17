@@ -40,6 +40,7 @@
     - [x] Track Pudge's HP from previous frames and add TickSleeper inside `state.ts`.
     - [x] Implement `runAutoMeatShield` in `abilities.ts` triggering on incoming projectiles, HP drops, and enemy Zeus casting Thundergod's Wrath.
     - [x] Integrate `runAutoMeatShield` invocation inside the PostDataUpdate hook of `index.ts`.
+    - [x] Refactor enemy ultimate triggers (Zeus/Lina/Lion) to use a single `AddDynamicImageSelector` grid in Pudge config.
 - [x] Implement Enhanced ESP: Blocker Highlights & Predicted Intercept (2026-06-17)
     - [x] Add configuration option `espShowBlockers` in `config.ts`.
     - [x] Implement `getHookBlocker` in `tracker.ts` returning the creep or hero entity blocking the trajectory.
@@ -47,9 +48,21 @@
     - [x] Render hook prediction target intercept ring as a 3D ground circle scaled to hook's real level collision radius.
     - [x] Render blocker highlight as a 3D red ground circle scaled to blocker's actual hull radius.
     - [x] Update trajectory line to a premium dashed line with color-coding: Neon Green (stable & clear), Orange (unstable & clear), Crimson Red (blocked).
+    - [x] Add spell icon texture to Pudge "Hook Settings" node in menu config.
 - [x] Implement Auto Item Activation feature (2026-06-17)
     - [x] Create configuration node and options for Eul/Wind Waker, BKB, Lotus, Blade Mail, Glimmer, and Pipe in `items/auto_items.ts`.
     - [x] Implement dynamic logic to monitor enemy ultimate casts (Zeus, Lina, Lion) and incoming targeted spell projectiles.
     - [x] Cast appropriate items using custom latency buffers and sleep durations to remain undetected.
     - [x] Add auto_items import in `index.ts`.
-
+    - [x] Refactor items list toggle and priority ordering to use `AddDynamicImageSelector` grid.
+    - [x] Refactor item triggers/conditions in sub-menus to use `AddDynamicImageSelector` visual grids.
+- [x] Add Strength attribute icon & fix Pudge config type errors (2026-06-17)
+    - [x] Add Strength attribute icon image using `ImageData.Icons.primary_attribute_strength` on `.AddNode("Strength")`.
+    - [x] Resolve compilation error in Pudge configuration by replacing `ImageData.GetHeroIcon` with `ImageData.GetHeroTexture("npc_dota_hero_pudge")`.
+    - [x] Clean up unused `PudgeState` import from Pudge `config.ts` to clear typescript compile warnings.
+- [x] Add user-friendly tooltip explanation to Auto Hook (Background) node (2026-06-17)
+    - [x] Configure a descriptive tooltip explaining that the script automatically hooks vulnerable, channeled, or stable targets in the background.
+- [x] Configure custom logo for Byteseeker root entry (2026-06-17)
+    - [x] Copy custom logo `logo_byteseeker_no_bg60px.png` to `scripts_files/icons/` to match standard asset layout.
+    - [x] Implement dynamic `getAssetPath` stack-based directory traversal to find the root folder path at runtime.
+    - [x] Update `Menu.AddEntry("Byteseeker")` to `Menu.AddEntry("Byteseeker", getAssetPath("icons/logo_byteseeker_no_bg60px.png"))` so that it resolves to a valid absolute path regardless of installation folder.

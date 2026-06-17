@@ -282,7 +282,7 @@ export function runAutoMeatShield(hero: Hero): void {
 	}
 
 	// 3. Check Zeus ultimate
-	if (!shouldActivate && PudgeConfig.meatShieldOnZeusUlt.value) {
+	if (!shouldActivate && PudgeConfig.meatShieldTriggers.IsEnabled("zuus_thundergods_wrath")) {
 		for (const enemy of EntityManager.GetEntitiesByClass(Hero)) {
 			if (
 				enemy.IsValid &&
@@ -301,7 +301,7 @@ export function runAutoMeatShield(hero: Hero): void {
 	}
 
 	// 4. Check Lina ultimate
-	if (!shouldActivate && PudgeConfig.meatShieldOnLinaUlt.value) {
+	if (!shouldActivate && PudgeConfig.meatShieldTriggers.IsEnabled("lina_laguna_blade")) {
 		for (const enemy of EntityManager.GetEntitiesByClass(Hero)) {
 			if (
 				enemy.IsValid &&
@@ -322,7 +322,7 @@ export function runAutoMeatShield(hero: Hero): void {
 	}
 
 	// 5. Check Lion ultimate
-	if (!shouldActivate && PudgeConfig.meatShieldOnLionUlt.value) {
+	if (!shouldActivate && PudgeConfig.meatShieldTriggers.IsEnabled("lion_finger_of_death")) {
 		for (const enemy of EntityManager.GetEntitiesByClass(Hero)) {
 			if (
 				enemy.IsValid &&

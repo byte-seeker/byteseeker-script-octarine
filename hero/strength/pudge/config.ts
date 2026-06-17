@@ -1,7 +1,34 @@
 import { ImageData, Menu } from "github.com/octarine-public/wrapper/index"
 
+const getAssetPath = (relativePath: string): string => {
+	const stack = new Error().stack
+	if (!stack) {
+		return relativePath
+	}
+	const lines = stack.split("\n")
+	const callerLine = lines[2] || ""
+	const match = /^\s{4}at\s(?:.+\s\()?(.+):\d+:\d+(?:\))?$/.exec(callerLine)
+	if (!match) {
+		return relativePath
+	}
+	const callerFile = match[1].replace(/\\/g, "/")
+	const parts = callerFile.split("/")
+	parts.pop() // remove filename
+	while (parts.length > 0) {
+		const checkPath = `${parts.join("/")}/scripts_files`
+		if (fexists(checkPath)) {
+			return `${checkPath}/${relativePath}`
+		}
+		parts.pop()
+	}
+	return relativePath
+}
+
 export const PudgeConfig = new (class {
-	public readonly entry = Menu.AddEntry("Byteseeker").AddNode("Hero").AddNode("Strength").AddNode("Pudge")
+	public readonly entry = Menu.AddEntry("Byteseeker", getAssetPath("icons/logo_byteseeker_no_bg60px.png"))
+		.AddNode("Hero", "panorama/images/hud/reborn/icon_hero_psd.vtex_c")
+		.AddNode("Strength", ImageData.Icons.primary_attribute_strength)
+		.AddNode("Pudge", ImageData.GetHeroTexture("npc_dota_hero_pudge"))
 
 	public readonly comboEnabled = this.entry.AddToggle("Enable Combo", true)
 	public readonly comboKey = this.entry.AddKeybind("Combo Key", "G", "Hold to execute combo")
@@ -10,7 +37,7 @@ export const PudgeConfig = new (class {
 	public readonly orbWalkDist = this.entry.AddSlider("Orb Walk Safe Distance %", 80, 10, 100)
 	public readonly orbWalkStop = this.entry.AddToggle("Stop-to-Cancel Backswing", false)
 
-	public readonly hookNode = this.entry.AddNode("Hook Settings")
+	public readonly hookNode = this.entry.AddNode("Hook Settings", ImageData.GetSpellTexture("pudge_meat_hook"))
 	public readonly collisionCheck = this.hookNode.AddToggle("Check Collision (Creeps)", true)
 	public readonly predBufMs = this.hookNode.AddSlider(
 		"Latency Buffer (ms)",
@@ -57,8 +84,8 @@ export const PudgeConfig = new (class {
 	)
 	public readonly stableThreshDeg = this.hookNode.AddSlider(
 		"Stability Threshold (deg)",
-		25,
 		5,
+		0,
 		60,
 		0,
 		"Max direction deviation to consider movement stable"
@@ -90,32 +117,16 @@ export const PudgeConfig = new (class {
 		10,
 		"Minimum HP drop in a single frame to activate"
 	)
-	public readonly meatShieldOnZeusUlt = this.meatShieldNode.AddToggle(
-		"On Zeus Ultimate",
-		true,
-		"Activate when enemy Zeus is casting Thundergod's Wrath",
-		0,
-		ImageData.GetSpellTexture("zuus_thundergods_wrath")
-	)
-	public readonly meatShieldOnLinaUlt = this.meatShieldNode.AddToggle(
-		"On Lina Ultimate",
-		true,
-		"Activate when enemy Lina is casting Laguna Blade on Pudge",
-		0,
-		ImageData.GetSpellTexture("lina_laguna_blade")
-	)
-	public readonly meatShieldOnLionUlt = this.meatShieldNode.AddToggle(
-		"On Lion Ultimate",
-		true,
-		"Activate when enemy Lion is casting Finger of Death on Pudge",
-		0,
-		ImageData.GetSpellTexture("lion_finger_of_death")
-	)
+	public meatShieldTriggers!: Menu.DynamicImageSelector
 
 	public readonly dismemberNode = this.entry.AddNode("Auto Dismember")
 	public readonly dismemberEnabled = this.dismemberNode.AddToggle("Enabled", true)
 
-	public readonly autoHookNode = this.entry.AddNode("Auto Hook (Background)")
+	public readonly autoHookNode = this.entry.AddNode(
+		"Auto Hook (Background)",
+		ImageData.GetSpellTexture("pudge_meat_hook"),
+		"Automatically cast Hook in the background on vulnerable, channeled, or stable targets without holding the combo key"
+	)
 	public readonly autoHookEnabled = this.autoHookNode.AddToggle("Enabled", false)
 	public readonly autoHookMinDist = this.autoHookNode.AddSlider("Min Distance", 200, 0, 600)
 
@@ -157,6 +168,17 @@ export const PudgeConfig = new (class {
 	public comboSequenceGrid: any
 
 	constructor() {
+		const shieldDef = new Map<string, [boolean, boolean, boolean, number]>()
+		shieldDef.set("zuus_thundergods_wrath", [true, true, true, 0])
+		shieldDef.set("lina_laguna_blade", [true, true, true, 1])
+		shieldDef.set("lion_finger_of_death", [true, true, true, 2])
+
+		this.meatShieldTriggers = this.meatShieldNode.AddDynamicImageSelector(
+			"Triggers (Zeus Ult / Lina Ult / Lion Ult)",
+			["zuus_thundergods_wrath", "lina_laguna_blade", "lion_finger_of_death"],
+			shieldDef
+		)
+
 		this.reinitGrids()
 	}
 
