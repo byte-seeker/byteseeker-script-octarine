@@ -49,7 +49,7 @@ export function castHook(hero: Hero, target: Hero): boolean {
 	}
 
 	const pos = calcCastPos(hero, target, hookRange)
-	if (PudgeConfig.collisionCheck.value && isHookBlocked(hero, target, pos, PudgeConfig.hookCollisionRadius.value)) {
+	if (PudgeConfig.collisionCheck.value && isHookBlocked(hero, target, pos, hook)) {
 		return false
 	}
 

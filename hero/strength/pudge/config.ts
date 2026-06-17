@@ -12,7 +12,6 @@ export const PudgeConfig = new (class {
 
 	public readonly hookNode = this.entry.AddNode("Hook Settings")
 	public readonly collisionCheck = this.hookNode.AddToggle("Check Collision (Creeps)", true)
-	public readonly hookCollisionRadius = this.hookNode.AddSlider("Collision Radius", 100, 50, 150)
 	public readonly predBufMs = this.hookNode.AddSlider(
 		"Latency Buffer (ms)",
 		50,
@@ -24,7 +23,7 @@ export const PudgeConfig = new (class {
 	public readonly requireStable = this.hookNode.AddToggle(
 		"Require Direction Stability",
 		true,
-		"Observe 0.3s enemy movement before firing hook"
+		"Observe 0.45s enemy movement before firing hook"
 	)
 	public readonly autoKsEnabled = this.hookNode.AddToggle(
 		"Auto KS with Hook",
@@ -69,7 +68,7 @@ export const PudgeConfig = new (class {
 	)
 	public readonly farmMoveToWave = this.farmNode.AddToggle(
 		"Move to Nearest Creep",
-		true,
+		false,
 		"Walk toward nearest creep if none in Rot range"
 	)
 

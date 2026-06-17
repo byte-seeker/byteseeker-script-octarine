@@ -20,5 +20,12 @@
     - [x] Add counter_items import in `index.ts`.
     - [x] Update Counter Items UI: Rename header to "Counter Items" and render the countered hero & reason side-by-side to the right of each item (2026-06-17)
     - [x] Add row index numbering (1., 2., etc.) on the absolute left of each counter item suggestion (2026-06-17)
+- [x] Dynamically fetch Pudge Meat Hook collision radius (2026-06-17)
+    - [x] Remove hardcoded `hookCollisionRadius` slider from Pudge Hook settings in `config.ts`.
+    - [x] Refactor `isHookBlocked` signature in `tracker.ts` to accept the hook ability directly, and update calls in `abilities.ts`, `auto_ks.ts`, and `auto_hook.ts` to pass the hook object, keeping the arguments clean and following DRY.
+    - [x] Update Hook Stability description text from 0.3s to 0.45s in `config.ts` to align with the actual `STABILITY_WINDOW`.
+
+
+
 
 

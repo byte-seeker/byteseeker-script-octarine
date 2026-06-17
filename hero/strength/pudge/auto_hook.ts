@@ -63,7 +63,7 @@ export function runAutoHook(hero: Hero): void {
 	}
 
 	const pos = calcCastPos(hero, best, hookRange)
-	if (PudgeConfig.collisionCheck.value && isHookBlocked(hero, best, pos, PudgeConfig.hookCollisionRadius.value)) {
+	if (PudgeConfig.collisionCheck.value && isHookBlocked(hero, best, pos, hook)) {
 		return
 	}
 

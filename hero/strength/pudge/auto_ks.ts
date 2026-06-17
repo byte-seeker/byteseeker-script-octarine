@@ -40,10 +40,7 @@ export function runAutoKillSteal(hero: Hero): void {
 
 		if (en.HP <= hookDamage && en.HP > 0) {
 			const pos = calcCastPos(hero, en, hookRange)
-			if (
-				PudgeConfig.collisionCheck.value &&
-				isHookBlocked(hero, en, pos, PudgeConfig.hookCollisionRadius.value)
-			) {
+			if (PudgeConfig.collisionCheck.value && isHookBlocked(hero, en, pos, hook)) {
 				continue
 			}
 			ExecuteOrder.PrepareOrder({

@@ -1,4 +1,4 @@
-import { Creep, EntityManager, GameState, Hero, Vector3 } from "github.com/octarine-public/wrapper/index"
+import { Ability, Creep, EntityManager, GameState, Hero, Vector3 } from "github.com/octarine-public/wrapper/index"
 
 import { PudgeConfig } from "./config"
 import { PudgeState } from "./state"
@@ -210,8 +210,9 @@ export function distToSegmentSquared(px: number, py: number, vx: number, vy: num
 	return (px - projX) * (px - projX) + (py - projY) * (py - projY)
 }
 
-export function isHookBlocked(hero: Hero, target: Hero, castPos: Vector3, radius: number): boolean {
+export function isHookBlocked(hero: Hero, target: Hero, castPos: Vector3, hook: Ability): boolean {
 	const hpos = hero.Position
+	const radius = hook.GetBaseAOERadiusForLevel(hook.Level)
 	const r2 = radius * radius
 
 	for (const creep of EntityManager.GetEntitiesByClass(Creep)) {
