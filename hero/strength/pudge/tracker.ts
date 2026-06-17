@@ -3,7 +3,6 @@ import { Ability, Creep, EntityManager, GameState, Hero, Vector3 } from "github.
 import { PudgeConfig } from "./config"
 import { PudgeState } from "./state"
 
-export const HOOK_SPEED = 1600
 export const STABILITY_WINDOW = 0.45
 
 export function updateTracker(enemy: Hero): void {
@@ -109,10 +108,18 @@ export function isDirectionStable(idx: number): boolean {
 	return true
 }
 
-export function solveIntercept(px: number, py: number, tx: number, ty: number, vx: number, vy: number): number | null {
+export function solveIntercept(
+	px: number,
+	py: number,
+	tx: number,
+	ty: number,
+	vx: number,
+	vy: number,
+	speed: number
+): number | null {
 	const dx = tx - px
 	const dy = ty - py
-	const a = vx * vx + vy * vy - HOOK_SPEED * HOOK_SPEED
+	const a = vx * vx + vy * vy - speed * speed
 	const b = 2 * (dx * vx + dy * vy)
 	const c = dx * dx + dy * dy
 
@@ -150,7 +157,10 @@ export function calcCastPos(hero: Hero, target: Hero, hookRange: number): Vector
 	const vel = getVelocity(target.Index)
 	const bufSec = PudgeConfig.predBufMs.value / 1000 + GameState.InputLag
 
-	const t = solveIntercept(hp.x, hp.y, tp.x, tp.y, vel.vx, vel.vy)
+	const hook = hero.GetAbilityByName("pudge_meat_hook")
+	const speed = hook && hook.IsValid && hook.Level > 0 ? hook.GetBaseSpeedForLevel(hook.Level) : 1600
+
+	const t = solveIntercept(hp.x, hp.y, tp.x, tp.y, vel.vx, vel.vy, speed)
 	let cx: number
 	let cy: number
 
