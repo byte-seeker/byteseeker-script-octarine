@@ -613,7 +613,9 @@ function getHeroNameClean(rawName: string): string {
 
 class CounterItemsUtility {
 	private readonly entry = Menu.AddEntry("Byteseeker")
-	private readonly node = this.entry.AddNode("Utility").AddNode("Counter Items")
+	private readonly node = this.entry
+		.AddNode("Utility")
+		.AddNode("Counter Items Information", ImageData.Icons.icon_analytics)
 	private readonly enabled = this.node.AddToggle("Enabled", true)
 	private readonly posX = this.node.AddSlider("Position X", 1600, 0, 3840)
 	private readonly posY = this.node.AddSlider("Position Y", 250, 0, 2160)

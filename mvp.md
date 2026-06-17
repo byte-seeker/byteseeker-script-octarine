@@ -71,4 +71,8 @@
 
 - [x] Fix Hero node icon path (2026-06-17)
     - [x] Replace invalid raw path `"panorama/images/hud/reborn/icon_hero_psd.vtex_c"` with dynamic `ImageData.GetHeroTexture("npc_dota_hero_pudge", true)` which returns the correct small hero texture.
+- [x] Add icon image to Counter Items Information & Radius nodes (2026-06-17)
+    - [x] Add `ImageData.Icons.icon_analytics` to the Counter Items Information menu node.
+    - [x] Add `ImageData.GetItemTexture("item_dragon_lance")` to the Radius menu node.
+
 

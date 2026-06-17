@@ -2,6 +2,7 @@ import {
 	Color,
 	EventsSDK,
 	ExecuteOrder,
+	ImageData,
 	LocalPlayer,
 	Menu,
 	PARTICLE_RENDER,
@@ -11,7 +12,7 @@ import {
 
 class RadiusUtility {
 	private readonly entry = Menu.AddEntry("Byteseeker")
-	private readonly node = this.entry.AddNode("Utility").AddNode("Radius")
+	private readonly node = this.entry.AddNode("Utility").AddNode("Radius", ImageData.Icons.softedge_circle_sharp)
 	private readonly enabled = this.node.AddToggle("Dynamic Attack Range", true)
 	private readonly rangeStyle = this.node.AddDropdown("Style", ["Normal", "Rope"], 0)
 	private readonly color = this.node.AddColorPicker("Color", Color.Aqua.SetA(180))
