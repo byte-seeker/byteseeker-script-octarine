@@ -99,6 +99,7 @@
     - [x] Fix Auto Farm forcibly turning off Rot at low HP when Rot was activated manually by the user, respecting manual activation intent.
     - [x] Fix `radius.ts` particle flickering every 5 seconds by implementing state caching to prevent spamming `DrawCircle` on every frame.
     - [x] Implement Master Toggles for `Heroes`, `Pudge`, `Drow Ranger`, and `Radius` scripts to allow user to dynamically enable/disable scripts during gameplay.
+    - [x] Integrate `Auto Save` and `Anti Initiation` modules from `example-repo` into the project, mapping their menus to the Byteseeker global configuration.
 
 ## Investigation Notes
 - **Zeus Ultimate Detection in Fog of War (2026-06-17)**:
