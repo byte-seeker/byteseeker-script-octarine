@@ -4,9 +4,11 @@ import { getAssetPath } from "../../../utility/asset"
 
 export const PudgeConfig = new (class {
 	public readonly entry = Menu.AddEntry("Byteseeker", getAssetPath("icons/logo_byteseeker_no_bg60px.png"))
-		.AddNode("Hero", ImageData.Icons.icon_svg_alien)
+		.AddNode("Heroes", ImageData.Icons.icon_svg_alien)
 		.AddNode("Strength", ImageData.Icons.primary_attribute_strength)
 		.AddNode("Pudge", ImageData.GetHeroTexture("npc_dota_hero_pudge", true))
+
+	public readonly scriptEnabled = this.entry.AddToggle("Enable Pudge Script", true)
 
 	public readonly comboEnabled = this.entry.AddToggle("Enable Combo", true)
 	public readonly comboRadius = this.entry.AddSlider("Target Search Radius", 800, 300, 1500)

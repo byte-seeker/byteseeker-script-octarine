@@ -97,6 +97,8 @@
     - [x] Create `utility/state.ts` with `BaseState` class to share base `sleeper` and `onGameEnded` functionality across all hero states.
     - [x] Fix Pudge Auto Rot stuck-on bug by removing premature flag reset, ensuring script aggressively retries turning off Rot if the initial order is dropped by server (e.g., due to stun).
     - [x] Fix Auto Farm forcibly turning off Rot at low HP when Rot was activated manually by the user, respecting manual activation intent.
+    - [x] Fix `radius.ts` particle flickering every 5 seconds by implementing state caching to prevent spamming `DrawCircle` on every frame.
+    - [x] Implement Master Toggles for `Heroes`, `Pudge`, `Drow Ranger`, and `Radius` scripts to allow user to dynamically enable/disable scripts during gameplay.
 
 ## Investigation Notes
 - **Zeus Ultimate Detection in Fog of War (2026-06-17)**:

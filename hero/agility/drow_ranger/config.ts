@@ -4,9 +4,11 @@ import { getAssetPath } from "../../../utility/asset"
 
 export const DrowRangerConfig = new (class {
 	public readonly entry = Menu.AddEntry("Byteseeker", getAssetPath("icons/logo_byteseeker_no_bg60px.png"))
-		.AddNode("Hero", ImageData.Icons.icon_svg_alien)
+		.AddNode("Heroes", ImageData.Icons.icon_svg_alien)
 		.AddNode("Agility", ImageData.Icons.primary_attribute_agility)
 		.AddNode("Drow Ranger", ImageData.GetHeroTexture("npc_dota_hero_drow_ranger", true))
+
+	public readonly scriptEnabled = this.entry.AddToggle("Enable Drow Ranger Script", true)
 
 	public readonly autoFrostArrowsNode = this.entry.AddNode(
 		"Auto Frost Arrows",

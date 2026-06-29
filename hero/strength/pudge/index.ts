@@ -7,6 +7,7 @@ import {
 	LocalPlayer
 } from "github.com/octarine-public/wrapper/index"
 
+import { GlobalConfig } from "../../../utility/global_config"
 import { isLocalHero } from "../../../utility/hero"
 import { runAutoMeatShield, runHookCancel } from "./abilities"
 import { runAutoFarm } from "./auto_farm"
@@ -30,7 +31,13 @@ new (class PudgeModule {
 	}
 
 	private PostDataUpdate(delta: number): void {
-		if (delta === 0 || !this.hasLocalHero || ExecuteOrder.DisableHumanizer) {
+		if (
+			delta === 0 ||
+			!this.hasLocalHero ||
+			ExecuteOrder.DisableHumanizer ||
+			!GlobalConfig.heroesEnabled.value ||
+			!PudgeConfig.scriptEnabled.value
+		) {
 			return
 		}
 		const hero = LocalPlayer?.Hero
