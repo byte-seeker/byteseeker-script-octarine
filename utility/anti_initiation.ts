@@ -80,10 +80,10 @@ new (class AntiInitiationUtility {
 
 	// Anti Initiation Nodes
 	private readonly antiInitiationNode = this.entry.AddNode("Anti Initiation")
-	private readonly antiInitEnabled = this.antiInitiationNode.AddToggle("Enabled", true)
+	private readonly antiInitEnabled = this.antiInitiationNode.AddToggle("State", true)
 	private readonly antiInitRange = this.antiInitiationNode.AddSlider("Trigger Range", 450, 200, 800)
 	private readonly antiInitSuddenOnly = this.antiInitiationNode.AddToggle("Only on Sudden Arrival", true)
-	private readonly antiInitDebug = this.antiInitiationNode.AddToggle("Draw Debug Overlay", true)
+	private readonly antiInitDebug = this.antiInitiationNode.AddToggle("Draw Debug Overlay", false)
 	private readonly priorityType = this.antiInitiationNode.AddDropdown(
 		"Priority Type",
 		["Items First", "Spells First"],

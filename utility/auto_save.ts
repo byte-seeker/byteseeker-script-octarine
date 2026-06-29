@@ -170,7 +170,7 @@ const MAGIC_THREAT_MODIFIERS = [
 new (class AutoSaveUtility {
 	private readonly entry = GlobalConfig.entry
 	private readonly node = this.entry.AddNode("Auto Save")
-	private readonly enabled = this.node.AddToggle("Enabled", true)
+	private readonly enabled = this.node.AddToggle("State", true)
 
 	private readonly priority = this.node.AddDropdown("Save Priority", ["Self First", "Team First"], 0)
 
