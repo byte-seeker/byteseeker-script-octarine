@@ -26,7 +26,8 @@ export function castHook(hero: Hero, target: Hero): boolean {
 		return false
 	}
 
-	const hookRange = hook.CastRange > 0 ? hook.CastRange : 1300
+	let hookRange = hook.CastRange > 0 ? hook.CastRange : 1300
+	hookRange = hookRange > 0 ? hookRange - 200 : hookRange
 	if (hero.Distance2D(target) > hookRange) {
 		return false
 	}

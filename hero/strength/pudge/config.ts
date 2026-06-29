@@ -1,37 +1,6 @@
 import { ImageData, Menu } from "github.com/octarine-public/wrapper/index"
 
-const getAssetPath = (relativePath: string): string => {
-	const stack = new Error().stack
-	const fallback = `github.com/byte-seeker/byteseeker-script-octarine/scripts_files/${relativePath}`
-	if (!stack) {
-		return fallback
-	}
-	const lines = stack.split("\n")
-	const callerLine = lines[2] || ""
-	const match = /^\s{4}at\s(?:.+\s\()?(.+):\d+:\d+(?:\))?$/.exec(callerLine)
-	if (!match) {
-		return fallback
-	}
-	const callerFile = match[1].replace(/\\/g, "/")
-	const parts = callerFile.split("/")
-	parts.pop() // remove filename
-	while (parts.length > 0) {
-		const checkPath = `${parts.join("/")}/scripts_files/${relativePath}`
-		if (fexists(checkPath)) {
-			const githubIdx = checkPath.indexOf("github.com/")
-			if (githubIdx !== -1) {
-				return checkPath.substring(githubIdx)
-			}
-			const repoIdx = checkPath.indexOf("byteseeker-script-octarine/scripts_files/")
-			if (repoIdx !== -1) {
-				return `github.com/byte-seeker/${checkPath.substring(repoIdx)}`
-			}
-			return checkPath
-		}
-		parts.pop()
-	}
-	return fallback
-}
+import { getAssetPath } from "../../../utility/asset"
 
 export const PudgeConfig = new (class {
 	public readonly entry = Menu.AddEntry("Byteseeker", getAssetPath("icons/logo_byteseeker_no_bg60px.png"))
@@ -40,7 +9,6 @@ export const PudgeConfig = new (class {
 		.AddNode("Pudge", ImageData.GetHeroTexture("npc_dota_hero_pudge", true))
 
 	public readonly comboEnabled = this.entry.AddToggle("Enable Combo", true)
-	public readonly comboKey = this.entry.AddKeybind("Combo Key", "G", "Hold to execute combo")
 	public readonly comboRadius = this.entry.AddSlider("Target Search Radius", 800, 300, 1500)
 	public readonly orbWalkEnabled = this.entry.AddToggle("Enable Smart Orb Walk", true)
 	public readonly orbWalkDist = this.entry.AddSlider("Orb Walk Safe Distance %", 80, 10, 100)

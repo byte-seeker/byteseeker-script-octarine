@@ -7,6 +7,7 @@ import {
 	LocalPlayer
 } from "github.com/octarine-public/wrapper/index"
 
+import { isLocalHero } from "../../../utility/hero"
 import { runAutoMeatShield, runHookCancel } from "./abilities"
 import { runAutoFarm } from "./auto_farm"
 import { runAutoHook } from "./auto_hook"
@@ -25,12 +26,7 @@ new (class PudgeModule {
 	}
 
 	private get hasLocalHero(): boolean {
-		return (
-			LocalPlayer !== undefined &&
-			LocalPlayer.Hero !== undefined &&
-			LocalPlayer.Hero.IsValid &&
-			LocalPlayer.Hero.Name === "npc_dota_hero_pudge"
-		)
+		return isLocalHero("npc_dota_hero_pudge")
 	}
 
 	private PostDataUpdate(delta: number): void {

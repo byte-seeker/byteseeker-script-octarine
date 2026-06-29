@@ -1,13 +1,14 @@
 import { EntityManager, Hero, InputManager } from "github.com/octarine-public/wrapper/index"
 
 import { executeOrbwalk } from "../../../orbwalker"
+import { GlobalComboKey } from "../../../utility/combo_key"
 import { castDismember, castHook, castRot, isVulnerable } from "./abilities"
 import { PudgeConfig } from "./config"
 import { PudgeState } from "./state"
 
 export function runCombo(hero: Hero): void {
 	// @ts-ignore
-	if (!PudgeConfig.comboKey.isPressed) {
+	if (!GlobalComboKey.isPressed) {
 		castRot(hero, undefined)
 		return
 	}

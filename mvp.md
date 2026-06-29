@@ -83,6 +83,17 @@
     - [x] Export `isZeusUltParticleActive` as a pre-configured instance watching `zuus_thundergods_wrath_start.vpcf`.
     - [x] Update `items/auto_items.ts`: Zeus `triggerZeus` now `IsInAbilityPhase || isZeusUltParticleActive()`.
     - [x] Update `hero/strength/pudge/abilities.ts`: `runAutoMeatShield` Zeus check now `IsInAbilityPhase || isZeusUltParticleActive()`.
+- [x] Implement Drow Ranger Auto-Cast Script (2026-06-29)
+    - [x] Create `hero/agility/drow_ranger/config.ts` for Menu configuration.
+    - [x] Create `hero/agility/drow_ranger/state.ts` for TickSleeper state management.
+    - [x] Create `hero/agility/drow_ranger/abilities.ts` with `runAutoFrostArrows` logic.
+    - [x] Create `hero/agility/drow_ranger/index.ts` to bind event listeners and main execution frame.
+    - [x] Import Drow Ranger module into root `index.ts`.
+- [x] Apply DRY principles across Hero modules (2026-06-29)
+    - [x] Create `utility/asset.ts` to centralize `getAssetPath` image path resolution logic.
+    - [x] Create `utility/hero.ts` to centralize `isLocalHero` validation logic.
+    - [x] Refactor `hero/strength/pudge` and `hero/agility/drow_ranger` configs and indexes to use centralized utilities.
+    - [x] Create `utility/combo_key.ts` to centralize `GlobalComboKey` so all heroes share the exact same combo execution button natively.
 
 ## Investigation Notes
 - **Zeus Ultimate Detection in Fog of War (2026-06-17)**:
