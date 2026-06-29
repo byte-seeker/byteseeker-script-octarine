@@ -64,10 +64,13 @@ class AutoItemsUtility {
 		"Shadow Blade / Silver Edge Settings",
 		ImageData.GetItemTexture("item_invis_sword")
 	)
-	private readonly sbSpells: Menu.DynamicImageSelector
 	private readonly sbTargeted = this.sbNode.AddToggle("Auto Use on Targeted Spells", true)
 
 	private readonly sleeper = new TickSleeper()
+
+	private zeusUltCastStartTime = -1
+	private lastZeusUltCastState = false
+	private zeusUltCastPoint = 0.4
 
 	constructor() {
 		// 1. Items Main Priority Selector
@@ -140,15 +143,6 @@ class AutoItemsUtility {
 			pipeDef
 		)
 
-		// 6. Shadow Blade / Silver Edge Triggers
-		const sbDef = new Map<string, [boolean, boolean, boolean, number]>()
-		sbDef.set("zuus_thundergods_wrath", [true, true, true, 0])
-		this.sbSpells = this.sbNode.AddDynamicImageSelector(
-			"Enemy Ultimate Triggers",
-			["zuus_thundergods_wrath"],
-			sbDef
-		)
-
 		// 7. Manta Style Triggers
 		const mantaDef = new Map<string, [boolean, boolean, boolean, number]>()
 		mantaDef.set("zuus_thundergods_wrath", [true, true, true, 0])
@@ -198,12 +192,15 @@ class AutoItemsUtility {
 
 		// Check Enemy Ultimates
 		for (const enemy of EntityManager.GetEntitiesByClass(Hero)) {
-			if (!enemy.IsValid || !enemy.IsAlive || !enemy.IsEnemy(hero) || enemy.IsIllusion) continue
+			if (!enemy.IsValid || !enemy.IsAlive || !enemy.IsEnemy(hero) || enemy.IsIllusion) {
+				continue
+			}
 
 			if (enemy.Name === "npc_dota_hero_zuus") {
 				const ult = enemy.GetAbilityByName("zuus_thundergods_wrath")
 				if (ult && ult.IsValid && ult.Level > 0 && ult.IsInAbilityPhase) {
 					isZeusCasting = true
+					this.zeusUltCastPoint = ult.CastPoint > 0 ? ult.CastPoint : 0.4
 				}
 			} else if (enemy.Name === "npc_dota_hero_lina") {
 				const ult = enemy.GetAbilityByName("lina_laguna_blade")
@@ -226,6 +223,14 @@ class AutoItemsUtility {
 		if (!isZeusCasting && isZeusUltParticleActive()) {
 			isZeusCasting = true
 		}
+
+		if (isZeusCasting && !this.lastZeusUltCastState) {
+			const particleStartTime = isZeusUltParticleActive.getStartTime()
+			this.zeusUltCastStartTime = particleStartTime > 0 ? particleStartTime : GameState.RawGameTime
+		} else if (!isZeusCasting) {
+			this.zeusUltCastStartTime = -1
+		}
+		this.lastZeusUltCastState = isZeusCasting
 
 		// Check Incoming Spell Projectiles
 		for (const proj of ProjectileManager.AllTrackingProjectiles) {
@@ -263,10 +268,14 @@ class AutoItemsUtility {
 
 		// 2. Iterate through Items based on priority
 		for (const itemName of this.itemsSelector.values) {
-			if (!this.itemsSelector.IsEnabled(itemName)) continue
+			if (!this.itemsSelector.IsEnabled(itemName)) {
+				continue
+			}
 
 			const item = hero.Inventory.GetItemByName(itemName)
-			if (!item || !item.CanBeCasted()) continue
+			if (!item || !item.CanBeCasted()) {
+				continue
+			}
 
 			// Evaluate Eul's Scepter & Wind Waker
 			if (itemName === "item_cyclone" || itemName === "item_wind_waker") {
@@ -330,10 +339,9 @@ class AutoItemsUtility {
 
 			// Evaluate Shadow Blade / Silver Edge
 			if (itemName === "item_invis_sword" || itemName === "item_silver_edge") {
-				const zeusActive = this.sbSpells.IsEnabled("zuus_thundergods_wrath") && isZeusCasting
 				const projActive = this.sbTargeted.value && isTargetedProjectileIncoming
 
-				if (zeusActive || projActive) {
+				if (projActive) {
 					this.castNoTargetItem(hero, item)
 					return
 				}
@@ -341,12 +349,25 @@ class AutoItemsUtility {
 
 			// Evaluate Manta Style
 			if (itemName === "item_manta") {
-				const zeusActive = this.mantaSpells.IsEnabled("zuus_thundergods_wrath") && isZeusCasting
+				let zeusMantaActive = false
+				if (this.mantaSpells.IsEnabled("zuus_thundergods_wrath") && isZeusCasting) {
+					if (this.zeusUltCastStartTime > 0) {
+						const elapsed = GameState.RawGameTime - this.zeusUltCastStartTime
+						if (elapsed >= this.zeusUltCastPoint - 0.05) {
+							zeusMantaActive = true
+						}
+					}
+				}
+
 				const linaActive = this.mantaSpells.IsEnabled("lina_laguna_blade") && isLinaCasting
 				const lionActive = this.mantaSpells.IsEnabled("lion_finger_of_death") && isLionCasting
 
-				if (zeusActive || linaActive || lionActive) {
-					this.castNoTargetItem(hero, item)
+				if (zeusMantaActive || linaActive || lionActive) {
+					if (zeusMantaActive) {
+						this.castMantaPerfect(hero, item)
+					} else {
+						this.castNoTargetItem(hero, item)
+					}
 					return
 				}
 			}
@@ -369,6 +390,19 @@ class AutoItemsUtility {
 			isPlayerInput: false
 		})
 		this.sleeper.Sleep(GameState.InputLag * 1000 + 190 + this.getHumanizerJitter())
+	}
+
+	private castMantaPerfect(hero: Hero, item: any): void {
+		ExecuteOrder.PrepareOrder({
+			orderType: dotaunitorder_t.DOTA_UNIT_ORDER_CAST_NO_TARGET,
+			issuers: [hero],
+			ability: item.Index,
+			queue: false,
+			showEffects: true,
+			isPlayerInput: false
+		})
+		// Ignore InputLag and Humanizer to ensure frame-perfect dodge timing
+		this.sleeper.Sleep(200)
 	}
 
 	private castNoTargetItem(hero: Hero, item: any): void {

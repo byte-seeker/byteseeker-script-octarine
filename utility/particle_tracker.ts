@@ -25,7 +25,12 @@ import { EventsSDK, GameState, Hero, LocalPlayer, NetworkedParticle } from "gith
  * // Per-frame usage
  * if (isZeusUltActive()) { ... }
  */
-export function createEnemyParticleTracker(particlePathSubstring: string, reactWindowSeconds = 1.5): () => boolean {
+export interface ParticleTracker {
+	(): boolean
+	getStartTime: () => number
+}
+
+export function createEnemyParticleTracker(particlePathSubstring: string, reactWindowSeconds = 1.5): ParticleTracker {
 	let detectedTime = -1
 
 	EventsSDK.on("ParticleCreated", (par: NetworkedParticle) => {
@@ -58,13 +63,15 @@ export function createEnemyParticleTracker(particlePathSubstring: string, reactW
 		detectedTime = -1
 	})
 
-	return (): boolean => {
+	const checker = (): boolean => {
 		if (detectedTime < 0) {
 			return false
 		}
 		const elapsed = GameState.RawGameTime - detectedTime
 		return elapsed >= 0 && elapsed <= reactWindowSeconds
 	}
+	checker.getStartTime = () => detectedTime
+	return checker
 }
 
 // ---------------------------------------------------------------------------

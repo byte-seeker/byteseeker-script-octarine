@@ -107,6 +107,9 @@
     - [x] Add Zeus Ultimate trigger logic for Shadow Blade and Silver Edge.
 - [x] Optimize Pudge Hook cast speed (2026-06-29)
     - [x] Removed `GameState.InputLag * 1000` from `castHook` in `abilities.ts` to ensure hook executes instantly without artificial delay.
+- [x] Fix Auto Items logic for latest Dota 2 Patch (2026-06-29)
+    - [x] Removed Shadow Blade & Silver Edge triggers for Zeus Ultimate since Thundergod's Wrath now deals damage to invisible units.
+    - [x] Implement precise frame-perfect dodge timing for Manta Style against Zeus Ultimate by fetching real `CastPoint` and calculating elapsed time minus `0.05s` buffer, intentionally bypassing `InputLag` to exploit the `0.1s` invulnerability frame perfectly.
 
 ## Investigation Notes
 - **Zeus Ultimate Detection in Fog of War (2026-06-17)**:
