@@ -55,6 +55,10 @@ class AutoItemsUtility {
 	private readonly pipeNode = this.node.AddNode("Pipe of Insight Settings", ImageData.GetItemTexture("item_pipe"))
 	private readonly pipeSpells: Menu.DynamicImageSelector
 
+	// Manta Style Settings
+	private readonly mantaNode = this.node.AddNode("Manta Style Settings", ImageData.GetItemTexture("item_manta"))
+	private readonly mantaSpells: Menu.DynamicImageSelector
+
 	// Shadow Blade / Silver Edge Settings
 	private readonly sbNode = this.node.AddNode(
 		"Shadow Blade / Silver Edge Settings",
@@ -77,6 +81,7 @@ class AutoItemsUtility {
 		itemsDef.set("item_pipe", [true, true, true, 6])
 		itemsDef.set("item_silver_edge", [true, true, true, 7])
 		itemsDef.set("item_invis_sword", [true, true, true, 8])
+		itemsDef.set("item_manta", [true, true, true, 9])
 
 		this.itemsSelector = this.node.AddDynamicImageSelector(
 			"Items Priority & Toggle",
@@ -89,7 +94,8 @@ class AutoItemsUtility {
 				"item_glimmer_cape",
 				"item_pipe",
 				"item_silver_edge",
-				"item_invis_sword"
+				"item_invis_sword",
+				"item_manta"
 			],
 			itemsDef
 		)
@@ -141,6 +147,17 @@ class AutoItemsUtility {
 			"Enemy Ultimate Triggers",
 			["zuus_thundergods_wrath"],
 			sbDef
+		)
+
+		// 7. Manta Style Triggers
+		const mantaDef = new Map<string, [boolean, boolean, boolean, number]>()
+		mantaDef.set("zuus_thundergods_wrath", [true, true, true, 0])
+		mantaDef.set("lina_laguna_blade", [true, true, true, 1])
+		mantaDef.set("lion_finger_of_death", [true, true, true, 2])
+		this.mantaSpells = this.mantaNode.AddDynamicImageSelector(
+			"Enemy Ultimate Triggers",
+			["zuus_thundergods_wrath", "lina_laguna_blade", "lion_finger_of_death"],
+			mantaDef
 		)
 
 		EventsSDK.on("PostDataUpdate", this.PostDataUpdate.bind(this))
@@ -317,6 +334,18 @@ class AutoItemsUtility {
 				const projActive = this.sbTargeted.value && isTargetedProjectileIncoming
 
 				if (zeusActive || projActive) {
+					this.castNoTargetItem(hero, item)
+					return
+				}
+			}
+
+			// Evaluate Manta Style
+			if (itemName === "item_manta") {
+				const zeusActive = this.mantaSpells.IsEnabled("zuus_thundergods_wrath") && isZeusCasting
+				const linaActive = this.mantaSpells.IsEnabled("lina_laguna_blade") && isLinaCasting
+				const lionActive = this.mantaSpells.IsEnabled("lion_finger_of_death") && isLionCasting
+
+				if (zeusActive || linaActive || lionActive) {
 					this.castNoTargetItem(hero, item)
 					return
 				}
