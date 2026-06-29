@@ -94,6 +94,7 @@
     - [x] Create `utility/hero.ts` to centralize `isLocalHero` validation logic.
     - [x] Refactor `hero/strength/pudge` and `hero/agility/drow_ranger` configs and indexes to use centralized utilities.
     - [x] Create `utility/combo_key.ts` to centralize `GlobalComboKey` so all heroes share the exact same combo execution button natively.
+    - [x] Create `utility/state.ts` with `BaseState` class to share base `sleeper` and `onGameEnded` functionality across all hero states.
 
 ## Investigation Notes
 - **Zeus Ultimate Detection in Fog of War (2026-06-17)**:

@@ -1,9 +1,3 @@
-import { TickSleeper } from "github.com/octarine-public/wrapper/index"
+import { BaseState } from "../../../utility/state"
 
-export const DrowRangerState = new (class {
-	public readonly sleeper = new TickSleeper()
-
-	public onGameEnded(): void {
-		this.sleeper.ResetTimer()
-	}
-})()
+export const DrowRangerState = new (class extends BaseState {})()

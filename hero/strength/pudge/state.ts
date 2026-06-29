@@ -1,9 +1,9 @@
 import { TickSleeper, Vector3 } from "github.com/octarine-public/wrapper/index"
 
+import { BaseState } from "../../../utility/state"
 import { EnemyTracker } from "./types"
 
-export const PudgeState = new (class {
-	public readonly sleeper = new TickSleeper()
+export const PudgeState = new (class extends BaseState {
 	public readonly rotSleeper = new TickSleeper()
 	public readonly dismemberSleeper = new TickSleeper()
 	public readonly farmSleeper = new TickSleeper()
@@ -22,8 +22,8 @@ export const PudgeState = new (class {
 
 	public lastRawGameTime = 0
 
-	public onGameEnded(): void {
-		this.sleeper.ResetTimer()
+	public override onGameEnded(): void {
+		super.onGameEnded()
 		this.autoHookSleeper.ResetTimer()
 		this.rotSleeper.ResetTimer()
 		this.trackerMap.clear()
