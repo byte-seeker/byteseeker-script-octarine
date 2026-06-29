@@ -16,9 +16,7 @@ import { isZeusUltParticleActive } from "../utility/particle_tracker"
 
 class AutoItemsUtility {
 	private readonly entry = Menu.AddEntry("Byteseeker")
-	private readonly node = this.entry
-		.AddNode("Utility", ImageData.Icons.icon_settings)
-		.AddNode("Auto Items", ImageData.Icons.icon_damage)
+	private readonly node = this.entry.AddNode("Auto Items", ImageData.Icons.icon_damage)
 	private readonly enabled = this.node.AddToggle("Enabled", true)
 
 	private readonly itemsSelector: Menu.DynamicImageSelector
@@ -71,6 +69,14 @@ class AutoItemsUtility {
 	private zeusUltCastStartTime = -1
 	private lastZeusUltCastState = false
 	private zeusUltCastPoint = 0.4
+
+	private linaUltCastStartTime = -1
+	private lastLinaUltCastState = false
+	private linaUltCastPoint = 0.45
+
+	private lionUltCastStartTime = -1
+	private lastLionUltCastState = false
+	private lionUltCastPoint = 0.3
 
 	constructor() {
 		// 1. Items Main Priority Selector
@@ -207,6 +213,7 @@ class AutoItemsUtility {
 				if (ult && ult.IsValid && ult.Level > 0 && ult.IsInAbilityPhase) {
 					if (hero.Distance2D(enemy) <= ult.CastRange + 100 && Math.abs(enemy.GetAngle(hero)) < 0.2) {
 						isLinaCasting = true
+						this.linaUltCastPoint = ult.CastPoint > 0 ? ult.CastPoint : 0.45
 					}
 				}
 			} else if (enemy.Name === "npc_dota_hero_lion") {
@@ -214,6 +221,7 @@ class AutoItemsUtility {
 				if (ult && ult.IsValid && ult.Level > 0 && ult.IsInAbilityPhase) {
 					if (hero.Distance2D(enemy) <= ult.CastRange + 100 && Math.abs(enemy.GetAngle(hero)) < 0.2) {
 						isLionCasting = true
+						this.lionUltCastPoint = ult.CastPoint > 0 ? ult.CastPoint : 0.3
 					}
 				}
 			}
@@ -231,6 +239,22 @@ class AutoItemsUtility {
 			this.zeusUltCastStartTime = -1
 		}
 		this.lastZeusUltCastState = isZeusCasting
+
+		// Lina Cast tracking
+		if (isLinaCasting && !this.lastLinaUltCastState) {
+			this.linaUltCastStartTime = GameState.RawGameTime
+		} else if (!isLinaCasting) {
+			this.linaUltCastStartTime = -1
+		}
+		this.lastLinaUltCastState = isLinaCasting
+
+		// Lion Cast tracking
+		if (isLionCasting && !this.lastLionUltCastState) {
+			this.lionUltCastStartTime = GameState.RawGameTime
+		} else if (!isLionCasting) {
+			this.lionUltCastStartTime = -1
+		}
+		this.lastLionUltCastState = isLionCasting
 
 		// Check Incoming Spell Projectiles
 		for (const proj of ProjectileManager.AllTrackingProjectiles) {
@@ -359,15 +383,28 @@ class AutoItemsUtility {
 					}
 				}
 
-				const linaActive = this.mantaSpells.IsEnabled("lina_laguna_blade") && isLinaCasting
-				const lionActive = this.mantaSpells.IsEnabled("lion_finger_of_death") && isLionCasting
-
-				if (zeusMantaActive || linaActive || lionActive) {
-					if (zeusMantaActive) {
-						this.castMantaPerfect(hero, item)
-					} else {
-						this.castNoTargetItem(hero, item)
+				let linaMantaActive = false
+				if (this.mantaSpells.IsEnabled("lina_laguna_blade") && isLinaCasting) {
+					if (this.linaUltCastStartTime > 0) {
+						const elapsed = GameState.RawGameTime - this.linaUltCastStartTime
+						if (elapsed >= this.linaUltCastPoint - 0.05) {
+							linaMantaActive = true
+						}
 					}
+				}
+
+				let lionMantaActive = false
+				if (this.mantaSpells.IsEnabled("lion_finger_of_death") && isLionCasting) {
+					if (this.lionUltCastStartTime > 0) {
+						const elapsed = GameState.RawGameTime - this.lionUltCastStartTime
+						if (elapsed >= this.lionUltCastPoint - 0.05) {
+							lionMantaActive = true
+						}
+					}
+				}
+
+				if (zeusMantaActive || linaMantaActive || lionMantaActive) {
+					this.castMantaPerfect(hero, item)
 					return
 				}
 			}
