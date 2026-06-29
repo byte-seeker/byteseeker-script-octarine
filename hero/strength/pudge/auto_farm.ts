@@ -8,6 +8,7 @@ import {
 	pudge_rot
 } from "github.com/octarine-public/wrapper/index"
 
+import { GlobalComboKey } from "../../../utility/combo_key"
 import { PudgeConfig } from "./config"
 import { PudgeState } from "./state"
 
@@ -18,7 +19,7 @@ export function runAutoFarm(hero: Hero): void {
 	}
 
 	// @ts-ignore
-	if (PudgeConfig.comboKey.isPressed) {
+	if (GlobalComboKey.isPressed) {
 		return
 	}
 
@@ -34,7 +35,7 @@ export function runAutoFarm(hero: Hero): void {
 	const isRotActive = hero.Buffs.some((b: any) => b.Name === "modifier_pudge_rot")
 	const hpPct = (hero.HP / hero.MaxHP) * 100
 
-	if (isRotActive && hpPct <= PudgeConfig.farmSafeHpPct.value) {
+	if (isRotActive && hpPct <= PudgeConfig.farmSafeHpPct.value && PudgeState.wasRotTurnedOnByFarm) {
 		if (!PudgeState.farmSleeper.Sleeping) {
 			ExecuteOrder.PrepareOrder({
 				orderType: dotaunitorder_t.DOTA_UNIT_ORDER_CAST_TOGGLE,
@@ -95,7 +96,6 @@ export function runAutoFarm(hero: Hero): void {
 				isPlayerInput: false
 			})
 			PudgeState.farmSleeper.Sleep(GameState.InputLag * 1000 + 300)
-			PudgeState.wasRotTurnedOnByFarm = false
 		}
 	}
 }

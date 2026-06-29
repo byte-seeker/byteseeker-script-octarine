@@ -120,7 +120,6 @@ export function castRot(hero: Hero, target: Hero | undefined): boolean {
 			isPlayerInput: false
 		})
 		PudgeState.rotSleeper.Sleep(GameState.InputLag * 1000 + 150)
-		PudgeState.wasRotTurnedOnByCombo = false
 		return true
 	}
 	return false
