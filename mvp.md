@@ -105,6 +105,8 @@
     - [x] Implement randomized humanizer jitter (`Math.random() * 60`) to auto-cast delay to remain undetected by anti-cheat.
     - [x] Refactor threat evaluation logic in `evaluateAutoItems` to follow DRY principles.
     - [x] Add Zeus Ultimate trigger logic for Shadow Blade and Silver Edge.
+- [x] Optimize Pudge Hook cast speed (2026-06-29)
+    - [x] Removed `GameState.InputLag * 1000` from `castHook` in `abilities.ts` to ensure hook executes instantly without artificial delay.
 
 ## Investigation Notes
 - **Zeus Ultimate Detection in Fog of War (2026-06-17)**:

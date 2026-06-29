@@ -74,7 +74,7 @@ export function castHook(hero: Hero, target: Hero): boolean {
 	})
 	PudgeState.lastHookTargetIndex = target.Index
 	PudgeState.lastHookCastPos = pos
-	PudgeState.sleeper.Sleep(GameState.InputLag * 1000 + hook.CastPoint * 1000 + 150)
+	PudgeState.sleeper.Sleep(hook.CastPoint * 1000 + 150)
 	return true
 }
 
