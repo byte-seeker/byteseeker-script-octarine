@@ -100,6 +100,11 @@
     - [x] Fix `radius.ts` particle flickering every 5 seconds by implementing state caching to prevent spamming `DrawCircle` on every frame.
     - [x] Implement Master Toggles for `Heroes`, `Pudge`, `Drow Ranger`, and `Radius` scripts to allow user to dynamically enable/disable scripts during gameplay.
     - [x] Integrate `Auto Save` and `Anti Initiation` modules from `example-repo` into the project, mapping their menus to the Byteseeker global configuration.
+- [x] Refactor Auto Items UI/UX & Security (2026-06-29)
+    - [x] Replace confusing placeholder icons (e.g. PA dagger for targeted spells) with text Toggles for better clarity.
+    - [x] Implement randomized humanizer jitter (`Math.random() * 60`) to auto-cast delay to remain undetected by anti-cheat.
+    - [x] Refactor threat evaluation logic in `evaluateAutoItems` to follow DRY principles.
+    - [x] Add Zeus Ultimate trigger logic for Shadow Blade and Silver Edge.
 
 ## Investigation Notes
 - **Zeus Ultimate Detection in Fog of War (2026-06-17)**:

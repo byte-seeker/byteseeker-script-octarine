@@ -58,7 +58,7 @@ export const PudgeConfig = new (class {
 	)
 	public readonly autoKsEnabled = this.hookNode.AddToggle(
 		"Auto KS with Hook",
-		true,
+		false,
 		"Automatically hook enemies if their HP is low enough to die"
 	)
 	public readonly stableThreshDeg = this.hookNode.AddSlider(

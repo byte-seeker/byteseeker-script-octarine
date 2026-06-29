@@ -23,36 +23,45 @@ class AutoItemsUtility {
 
 	private readonly itemsSelector: Menu.DynamicImageSelector
 
-	// Item Settings Nodes & Triggers Selectors
+	// Eul / Wind Waker Settings
 	private readonly eulNode = this.node.AddNode("Eul / Wind Waker Settings", ImageData.GetItemTexture("item_cyclone"))
-	private readonly eulTriggers: Menu.DynamicImageSelector
+	private readonly eulSpells: Menu.DynamicImageSelector
+	private readonly eulTargeted = this.eulNode.AddToggle("Auto Use on Targeted Spells", true)
 
+	// Black King Bar Settings
 	private readonly bkbNode = this.node.AddNode(
 		"Black King Bar Settings",
 		ImageData.GetItemTexture("item_black_king_bar")
 	)
-	private readonly bkbTriggers: Menu.DynamicImageSelector
+	private readonly bkbSpells: Menu.DynamicImageSelector
+	private readonly bkbStunSilence = this.bkbNode.AddToggle("Auto Use on Stun/Silence Projectiles", true)
 
+	// Lotus Orb Settings
 	private readonly lotusNode = this.node.AddNode("Lotus Orb Settings", ImageData.GetItemTexture("item_lotus_orb"))
-	private readonly lotusTriggers: Menu.DynamicImageSelector
+	private readonly lotusTargeted = this.lotusNode.AddToggle("Auto Use on Targeted Spells", true)
 
+	// Blade Mail Settings
 	private readonly bmNode = this.node.AddNode("Blade Mail Settings", ImageData.GetItemTexture("item_blade_mail"))
-	private readonly bmTriggers: Menu.DynamicImageSelector
+	private readonly bmSpells: Menu.DynamicImageSelector
 
+	// Glimmer Cape Settings
 	private readonly glimmerNode = this.node.AddNode(
 		"Glimmer Cape Settings",
 		ImageData.GetItemTexture("item_glimmer_cape")
 	)
-	private readonly glimmerTriggers: Menu.DynamicImageSelector
+	private readonly glimmerTargeted = this.glimmerNode.AddToggle("Auto Use on Targeted Spells", true)
 
+	// Pipe of Insight Settings
 	private readonly pipeNode = this.node.AddNode("Pipe of Insight Settings", ImageData.GetItemTexture("item_pipe"))
-	private readonly pipeTriggers: Menu.DynamicImageSelector
+	private readonly pipeSpells: Menu.DynamicImageSelector
 
+	// Shadow Blade / Silver Edge Settings
 	private readonly sbNode = this.node.AddNode(
 		"Shadow Blade / Silver Edge Settings",
 		ImageData.GetItemTexture("item_invis_sword")
 	)
-	private readonly sbTriggers: Menu.DynamicImageSelector
+	private readonly sbSpells: Menu.DynamicImageSelector
+	private readonly sbTargeted = this.sbNode.AddToggle("Auto Use on Targeted Spells", true)
 
 	private readonly sleeper = new TickSleeper()
 
@@ -90,74 +99,47 @@ class AutoItemsUtility {
 		eulDef.set("zuus_thundergods_wrath", [true, true, true, 0])
 		eulDef.set("lina_laguna_blade", [true, true, true, 1])
 		eulDef.set("lion_finger_of_death", [true, true, true, 2])
-		eulDef.set("phantom_assassin_stifling_dagger", [true, true, true, 3]) // Represent targeted spells
-
-		this.eulTriggers = this.eulNode.AddDynamicImageSelector(
-			"Eul Triggers (Zeus Ult / Lina Ult / Lion Ult / Targeted Spells)",
-			["zuus_thundergods_wrath", "lina_laguna_blade", "lion_finger_of_death", "phantom_assassin_stifling_dagger"],
+		this.eulSpells = this.eulNode.AddDynamicImageSelector(
+			"Enemy Ultimate Triggers",
+			["zuus_thundergods_wrath", "lina_laguna_blade", "lion_finger_of_death"],
 			eulDef
 		)
 
 		// 3. Black King Bar Triggers
 		const bkbDef = new Map<string, [boolean, boolean, boolean, number]>()
-		bkbDef.set("sven_storm_bolt", [true, true, true, 0]) // Represent stun/silence projectiles
-		bkbDef.set("zuus_thundergods_wrath", [false, true, true, 1])
-
-		this.bkbTriggers = this.bkbNode.AddDynamicImageSelector(
-			"BKB Triggers (Stun/Silence Spells / Zeus Ult)",
-			["sven_storm_bolt", "zuus_thundergods_wrath"],
+		bkbDef.set("zuus_thundergods_wrath", [true, true, true, 0])
+		this.bkbSpells = this.bkbNode.AddDynamicImageSelector(
+			"Enemy Ultimate Triggers",
+			["zuus_thundergods_wrath"],
 			bkbDef
 		)
 
-		// 4. Lotus Orb Triggers
-		const lotusDef = new Map<string, [boolean, boolean, boolean, number]>()
-		lotusDef.set("phantom_assassin_stifling_dagger", [true, true, true, 0]) // Represent targeted spells
-
-		this.lotusTriggers = this.lotusNode.AddDynamicImageSelector(
-			"Lotus Triggers (Targeted Spells)",
-			["phantom_assassin_stifling_dagger"],
-			lotusDef
-		)
-
-		// 5. Blade Mail Triggers
+		// 4. Blade Mail Triggers
 		const bmDef = new Map<string, [boolean, boolean, boolean, number]>()
 		bmDef.set("zuus_thundergods_wrath", [true, true, true, 0])
 		bmDef.set("lina_laguna_blade", [true, true, true, 1])
 		bmDef.set("lion_finger_of_death", [true, true, true, 2])
-
-		this.bmTriggers = this.bmNode.AddDynamicImageSelector(
-			"Blade Mail Triggers (Zeus Ult / Lina Ult / Lion Ult)",
+		this.bmSpells = this.bmNode.AddDynamicImageSelector(
+			"Enemy Ultimate Triggers",
 			["zuus_thundergods_wrath", "lina_laguna_blade", "lion_finger_of_death"],
 			bmDef
 		)
 
-		// 6. Glimmer Cape Triggers
-		const glimmerDef = new Map<string, [boolean, boolean, boolean, number]>()
-		glimmerDef.set("phantom_assassin_stifling_dagger", [true, true, true, 0]) // Represent targeted spells
-
-		this.glimmerTriggers = this.glimmerNode.AddDynamicImageSelector(
-			"Glimmer Triggers (Targeted Spells)",
-			["phantom_assassin_stifling_dagger"],
-			glimmerDef
-		)
-
-		// 7. Pipe of Insight Triggers
+		// 5. Pipe of Insight Triggers
 		const pipeDef = new Map<string, [boolean, boolean, boolean, number]>()
 		pipeDef.set("zuus_thundergods_wrath", [true, true, true, 0])
-
-		this.pipeTriggers = this.pipeNode.AddDynamicImageSelector(
-			"Pipe Triggers (Zeus Ult)",
+		this.pipeSpells = this.pipeNode.AddDynamicImageSelector(
+			"Enemy Ultimate Triggers",
 			["zuus_thundergods_wrath"],
 			pipeDef
 		)
 
-		// 8. Shadow Blade / Silver Edge Triggers
+		// 6. Shadow Blade / Silver Edge Triggers
 		const sbDef = new Map<string, [boolean, boolean, boolean, number]>()
-		sbDef.set("phantom_assassin_stifling_dagger", [true, true, true, 0]) // Represent targeted spells
-
-		this.sbTriggers = this.sbNode.AddDynamicImageSelector(
-			"SB / Silver Edge Triggers (Targeted Spells)",
-			["phantom_assassin_stifling_dagger"],
+		sbDef.set("zuus_thundergods_wrath", [true, true, true, 0])
+		this.sbSpells = this.sbNode.AddDynamicImageSelector(
+			"Enemy Ultimate Triggers",
+			["zuus_thundergods_wrath"],
 			sbDef
 		)
 
@@ -190,175 +172,122 @@ class AutoItemsUtility {
 	}
 
 	private evaluateAutoItems(hero: Hero): void {
-		// Triggers
-		let triggerZeus = false
-		let triggerLina = false
-		let triggerLion = false
-		let triggerProjectile = false
-		let targetSpellIsStunOrSilence = false
+		// 1. Evaluate Active Threats
+		let isZeusCasting = false
+		let isLinaCasting = false
+		let isLionCasting = false
+		let isTargetedProjectileIncoming = false
+		let isStunSilenceIncoming = false
 
-		// Check Zeus casting ultimate
-		const checkZeus =
-			(this.itemsSelector.IsEnabled("item_cyclone") && this.eulTriggers.IsEnabled("zuus_thundergods_wrath")) ||
-			(this.itemsSelector.IsEnabled("item_wind_waker") && this.eulTriggers.IsEnabled("zuus_thundergods_wrath")) ||
-			(this.itemsSelector.IsEnabled("item_black_king_bar") &&
-				this.bkbTriggers.IsEnabled("zuus_thundergods_wrath")) ||
-			(this.itemsSelector.IsEnabled("item_blade_mail") && this.bmTriggers.IsEnabled("zuus_thundergods_wrath")) ||
-			(this.itemsSelector.IsEnabled("item_pipe") && this.pipeTriggers.IsEnabled("zuus_thundergods_wrath"))
+		// Check Enemy Ultimates
+		for (const enemy of EntityManager.GetEntitiesByClass(Hero)) {
+			if (!enemy.IsValid || !enemy.IsAlive || !enemy.IsEnemy(hero) || enemy.IsIllusion) continue
 
-		if (checkZeus) {
-			// Primary: check IsInAbilityPhase (only works when Zeus is visible)
-			for (const enemy of EntityManager.GetEntitiesByClass(Hero)) {
+			if (enemy.Name === "npc_dota_hero_zuus") {
+				const ult = enemy.GetAbilityByName("zuus_thundergods_wrath")
+				if (ult && ult.IsValid && ult.Level > 0 && ult.IsInAbilityPhase) {
+					isZeusCasting = true
+				}
+			} else if (enemy.Name === "npc_dota_hero_lina") {
+				const ult = enemy.GetAbilityByName("lina_laguna_blade")
+				if (ult && ult.IsValid && ult.Level > 0 && ult.IsInAbilityPhase) {
+					if (hero.Distance2D(enemy) <= ult.CastRange + 100 && Math.abs(enemy.GetAngle(hero)) < 0.2) {
+						isLinaCasting = true
+					}
+				}
+			} else if (enemy.Name === "npc_dota_hero_lion") {
+				const ult = enemy.GetAbilityByName("lion_finger_of_death")
+				if (ult && ult.IsValid && ult.Level > 0 && ult.IsInAbilityPhase) {
+					if (hero.Distance2D(enemy) <= ult.CastRange + 100 && Math.abs(enemy.GetAngle(hero)) < 0.2) {
+						isLionCasting = true
+					}
+				}
+			}
+		}
+
+		// Fallback for Zeus in Fog of War
+		if (!isZeusCasting && isZeusUltParticleActive()) {
+			isZeusCasting = true
+		}
+
+		// Check Incoming Spell Projectiles
+		for (const proj of ProjectileManager.AllTrackingProjectiles) {
+			if (proj.Target === hero && !proj.IsDodged && !proj.IsAttack) {
+				isTargetedProjectileIncoming = true
+
+				const abilityName = proj.Ability?.Name || ""
 				if (
-					enemy.IsValid &&
-					enemy.IsAlive &&
-					enemy.IsEnemy(hero) &&
-					!enemy.IsIllusion &&
-					enemy.Name === "npc_dota_hero_zuus"
+					abilityName !== "" &&
+					(abilityName.includes("stun") ||
+						abilityName.includes("hex") ||
+						abilityName.includes("silence") ||
+						abilityName.includes("shackle") ||
+						abilityName.includes("bolt") ||
+						abilityName.includes("hammer") ||
+						abilityName.includes("magic_missile") ||
+						abilityName.includes("assassinate") ||
+						abilityName.includes("campsite"))
 				) {
-					const ult = enemy.GetAbilityByName("zuus_thundergods_wrath")
-					if (ult && ult.IsValid && ult.Level > 0 && ult.IsInAbilityPhase) {
-						triggerZeus = true
-						break
-					}
-				}
-			}
-
-			// Fallback: particle-based detection works even when Zeus is in fog of war.
-			// zuus_thundergods_wrath_start.vpcf is world-replicated to all clients.
-			if (!triggerZeus && isZeusUltParticleActive()) {
-				triggerZeus = true
-			}
-		}
-
-		// Check Lina / Lion casting ultimate targeting local hero
-		const checkLinaLion =
-			(this.itemsSelector.IsEnabled("item_cyclone") &&
-				(this.eulTriggers.IsEnabled("lina_laguna_blade") ||
-					this.eulTriggers.IsEnabled("lion_finger_of_death"))) ||
-			(this.itemsSelector.IsEnabled("item_wind_waker") &&
-				(this.eulTriggers.IsEnabled("lina_laguna_blade") ||
-					this.eulTriggers.IsEnabled("lion_finger_of_death"))) ||
-			(this.itemsSelector.IsEnabled("item_blade_mail") &&
-				(this.bmTriggers.IsEnabled("lina_laguna_blade") || this.bmTriggers.IsEnabled("lion_finger_of_death")))
-
-		if (checkLinaLion) {
-			for (const enemy of EntityManager.GetEntitiesByClass(Hero)) {
-				if (enemy.IsValid && enemy.IsAlive && enemy.IsEnemy(hero) && !enemy.IsIllusion) {
-					if (enemy.Name === "npc_dota_hero_lina") {
-						const ult = enemy.GetAbilityByName("lina_laguna_blade")
-						if (ult && ult.IsValid && ult.Level > 0 && ult.IsInAbilityPhase) {
-							if (hero.Distance2D(enemy) <= ult.CastRange + 100 && Math.abs(enemy.GetAngle(hero)) < 0.2) {
-								triggerLina = true
-							}
-						}
-					} else if (enemy.Name === "npc_dota_hero_lion") {
-						const ult = enemy.GetAbilityByName("lion_finger_of_death")
-						if (ult && ult.IsValid && ult.Level > 0 && ult.IsInAbilityPhase) {
-							if (hero.Distance2D(enemy) <= ult.CastRange + 100 && Math.abs(enemy.GetAngle(hero)) < 0.2) {
-								triggerLion = true
-							}
-						}
-					}
+					isStunSilenceIncoming = true
 				}
 			}
 		}
 
-		// Check incoming spell projectiles
-		const checkProjectiles =
-			(this.itemsSelector.IsEnabled("item_cyclone") &&
-				this.eulTriggers.IsEnabled("phantom_assassin_stifling_dagger")) ||
-			(this.itemsSelector.IsEnabled("item_wind_waker") &&
-				this.eulTriggers.IsEnabled("phantom_assassin_stifling_dagger")) ||
-			(this.itemsSelector.IsEnabled("item_black_king_bar") && this.bkbTriggers.IsEnabled("sven_storm_bolt")) ||
-			(this.itemsSelector.IsEnabled("item_lotus_orb") &&
-				this.lotusTriggers.IsEnabled("phantom_assassin_stifling_dagger")) ||
-			(this.itemsSelector.IsEnabled("item_glimmer_cape") &&
-				this.glimmerTriggers.IsEnabled("phantom_assassin_stifling_dagger")) ||
-			(this.itemsSelector.IsEnabled("item_silver_edge") &&
-				this.sbTriggers.IsEnabled("phantom_assassin_stifling_dagger")) ||
-			(this.itemsSelector.IsEnabled("item_invis_sword") &&
-				this.sbTriggers.IsEnabled("phantom_assassin_stifling_dagger"))
-
-		if (checkProjectiles) {
-			for (const proj of ProjectileManager.AllTrackingProjectiles) {
-				if (proj.Target === hero && !proj.IsDodged && !proj.IsAttack) {
-					triggerProjectile = true
-					const abilityName = proj.Ability?.Name || ""
-					if (
-						abilityName !== "" &&
-						(abilityName.includes("stun") ||
-							abilityName.includes("hex") ||
-							abilityName.includes("silence") ||
-							abilityName.includes("shackle") ||
-							abilityName.includes("bolt") ||
-							abilityName.includes("hammer") ||
-							abilityName.includes("magic_missile") ||
-							abilityName.includes("assassinate") ||
-							abilityName.includes("campsite"))
-					) {
-						targetSpellIsStunOrSilence = true
-					}
-				}
-			}
+		// If there is no threat at all, we can exit early and save performance
+		if (
+			!isZeusCasting &&
+			!isLinaCasting &&
+			!isLionCasting &&
+			!isTargetedProjectileIncoming &&
+			!isStunSilenceIncoming
+		) {
+			return
 		}
 
-		// Iterate through items by their priority order (as sorted in menu)
+		// 2. Iterate through Items based on priority
 		for (const itemName of this.itemsSelector.values) {
-			if (!this.itemsSelector.IsEnabled(itemName)) {
-				continue
-			}
+			if (!this.itemsSelector.IsEnabled(itemName)) continue
 
 			const item = hero.Inventory.GetItemByName(itemName)
-			if (!item || !item.CanBeCasted()) {
-				continue
-			}
+			if (!item || !item.CanBeCasted()) continue
 
-			// 1. Eul's / Wind Waker (Self-Cast)
+			// Evaluate Eul's Scepter & Wind Waker
 			if (itemName === "item_cyclone" || itemName === "item_wind_waker") {
-				const zeusActive = this.eulTriggers.IsEnabled("zuus_thundergods_wrath") && triggerZeus
-				const linaActive = this.eulTriggers.IsEnabled("lina_laguna_blade") && triggerLina
-				const lionActive = this.eulTriggers.IsEnabled("lion_finger_of_death") && triggerLion
-				const projActive = this.eulTriggers.IsEnabled("phantom_assassin_stifling_dagger") && triggerProjectile
+				const zeusActive = this.eulSpells.IsEnabled("zuus_thundergods_wrath") && isZeusCasting
+				const linaActive = this.eulSpells.IsEnabled("lina_laguna_blade") && isLinaCasting
+				const lionActive = this.eulSpells.IsEnabled("lion_finger_of_death") && isLionCasting
+				const projActive = this.eulTargeted.value && isTargetedProjectileIncoming
 
 				if (zeusActive || linaActive || lionActive || projActive) {
 					this.castTargetItem(hero, item, hero)
-					return
+					return // Only use one item per frame
 				}
 			}
 
-			// 2. Lotus Orb (Self-Cast)
-			if (itemName === "item_lotus_orb") {
-				if (this.lotusTriggers.IsEnabled("phantom_assassin_stifling_dagger") && triggerProjectile) {
-					this.castTargetItem(hero, item, hero)
-					return
-				}
-			}
-
-			// 3. Glimmer Cape (Self-Cast)
-			if (itemName === "item_glimmer_cape") {
-				if (this.glimmerTriggers.IsEnabled("phantom_assassin_stifling_dagger") && triggerProjectile) {
-					this.castTargetItem(hero, item, hero)
-					return
-				}
-			}
-
-			// 4. BKB (No-Target)
+			// Evaluate Black King Bar
 			if (itemName === "item_black_king_bar") {
-				const stunActive = this.bkbTriggers.IsEnabled("sven_storm_bolt") && targetSpellIsStunOrSilence
-				const zeusActive = this.bkbTriggers.IsEnabled("zuus_thundergods_wrath") && triggerZeus
+				const zeusActive = this.bkbSpells.IsEnabled("zuus_thundergods_wrath") && isZeusCasting
+				const stunActive = this.bkbStunSilence.value && isStunSilenceIncoming
 
-				if (stunActive || zeusActive) {
+				if (zeusActive || stunActive) {
 					this.castNoTargetItem(hero, item)
 					return
 				}
 			}
 
-			// 5. Blade Mail (No-Target)
+			// Evaluate Lotus Orb
+			if (itemName === "item_lotus_orb") {
+				if (this.lotusTargeted.value && isTargetedProjectileIncoming) {
+					this.castTargetItem(hero, item, hero)
+					return
+				}
+			}
+
+			// Evaluate Blade Mail
 			if (itemName === "item_blade_mail") {
-				const zeusActive = this.bmTriggers.IsEnabled("zuus_thundergods_wrath") && triggerZeus
-				const linaActive = this.bmTriggers.IsEnabled("lina_laguna_blade") && triggerLina
-				const lionActive = this.bmTriggers.IsEnabled("lion_finger_of_death") && triggerLion
+				const zeusActive = this.bmSpells.IsEnabled("zuus_thundergods_wrath") && isZeusCasting
+				const linaActive = this.bmSpells.IsEnabled("lina_laguna_blade") && isLinaCasting
+				const lionActive = this.bmSpells.IsEnabled("lion_finger_of_death") && isLionCasting
 
 				if (zeusActive || linaActive || lionActive) {
 					this.castNoTargetItem(hero, item)
@@ -366,22 +295,38 @@ class AutoItemsUtility {
 				}
 			}
 
-			// 6. Pipe of Insight (No-Target)
+			// Evaluate Glimmer Cape
+			if (itemName === "item_glimmer_cape") {
+				if (this.glimmerTargeted.value && isTargetedProjectileIncoming) {
+					this.castTargetItem(hero, item, hero)
+					return
+				}
+			}
+
+			// Evaluate Pipe of Insight
 			if (itemName === "item_pipe") {
-				if (this.pipeTriggers.IsEnabled("zuus_thundergods_wrath") && triggerZeus) {
+				if (this.pipeSpells.IsEnabled("zuus_thundergods_wrath") && isZeusCasting) {
 					this.castNoTargetItem(hero, item)
 					return
 				}
 			}
 
-			// 7. Shadow Blade / Silver Edge (No-Target)
+			// Evaluate Shadow Blade / Silver Edge
 			if (itemName === "item_invis_sword" || itemName === "item_silver_edge") {
-				if (this.sbTriggers.IsEnabled("phantom_assassin_stifling_dagger") && triggerProjectile) {
+				const zeusActive = this.sbSpells.IsEnabled("zuus_thundergods_wrath") && isZeusCasting
+				const projActive = this.sbTargeted.value && isTargetedProjectileIncoming
+
+				if (zeusActive || projActive) {
 					this.castNoTargetItem(hero, item)
 					return
 				}
 			}
 		}
+	}
+
+	private getHumanizerJitter(): number {
+		// Returns a random delay between 0ms to 60ms to avoid static patterns for anti-cheat
+		return Math.floor(Math.random() * 60)
 	}
 
 	private castTargetItem(hero: Hero, item: any, target: Hero): void {
@@ -394,7 +339,7 @@ class AutoItemsUtility {
 			showEffects: true,
 			isPlayerInput: false
 		})
-		this.sleeper.Sleep(GameState.InputLag * 1000 + 250)
+		this.sleeper.Sleep(GameState.InputLag * 1000 + 190 + this.getHumanizerJitter())
 	}
 
 	private castNoTargetItem(hero: Hero, item: any): void {
@@ -406,7 +351,7 @@ class AutoItemsUtility {
 			showEffects: true,
 			isPlayerInput: false
 		})
-		this.sleeper.Sleep(GameState.InputLag * 1000 + 250)
+		this.sleeper.Sleep(GameState.InputLag * 1000 + 190 + this.getHumanizerJitter())
 	}
 
 	private GameEnded(): void {
