@@ -48,6 +48,12 @@ class AutoItemsUtility {
 	private readonly pipeNode = this.node.AddNode("Pipe of Insight Settings", ImageData.GetItemTexture("item_pipe"))
 	private readonly pipeTriggers: Menu.DynamicImageSelector
 
+	private readonly sbNode = this.node.AddNode(
+		"Shadow Blade / Silver Edge Settings",
+		ImageData.GetItemTexture("item_invis_sword")
+	)
+	private readonly sbTriggers: Menu.DynamicImageSelector
+
 	private readonly sleeper = new TickSleeper()
 
 	constructor() {
@@ -60,6 +66,8 @@ class AutoItemsUtility {
 		itemsDef.set("item_blade_mail", [true, true, true, 4])
 		itemsDef.set("item_glimmer_cape", [true, true, true, 5])
 		itemsDef.set("item_pipe", [true, true, true, 6])
+		itemsDef.set("item_silver_edge", [true, true, true, 7])
+		itemsDef.set("item_invis_sword", [true, true, true, 8])
 
 		this.itemsSelector = this.node.AddDynamicImageSelector(
 			"Items Priority & Toggle",
@@ -70,7 +78,9 @@ class AutoItemsUtility {
 				"item_lotus_orb",
 				"item_blade_mail",
 				"item_glimmer_cape",
-				"item_pipe"
+				"item_pipe",
+				"item_silver_edge",
+				"item_invis_sword"
 			],
 			itemsDef
 		)
@@ -139,6 +149,16 @@ class AutoItemsUtility {
 			"Pipe Triggers (Zeus Ult)",
 			["zuus_thundergods_wrath"],
 			pipeDef
+		)
+
+		// 8. Shadow Blade / Silver Edge Triggers
+		const sbDef = new Map<string, [boolean, boolean, boolean, number]>()
+		sbDef.set("phantom_assassin_stifling_dagger", [true, true, true, 0]) // Represent targeted spells
+
+		this.sbTriggers = this.sbNode.AddDynamicImageSelector(
+			"SB / Silver Edge Triggers (Targeted Spells)",
+			["phantom_assassin_stifling_dagger"],
+			sbDef
 		)
 
 		EventsSDK.on("PostDataUpdate", this.PostDataUpdate.bind(this))
@@ -254,7 +274,11 @@ class AutoItemsUtility {
 			(this.itemsSelector.IsEnabled("item_lotus_orb") &&
 				this.lotusTriggers.IsEnabled("phantom_assassin_stifling_dagger")) ||
 			(this.itemsSelector.IsEnabled("item_glimmer_cape") &&
-				this.glimmerTriggers.IsEnabled("phantom_assassin_stifling_dagger"))
+				this.glimmerTriggers.IsEnabled("phantom_assassin_stifling_dagger")) ||
+			(this.itemsSelector.IsEnabled("item_silver_edge") &&
+				this.sbTriggers.IsEnabled("phantom_assassin_stifling_dagger")) ||
+			(this.itemsSelector.IsEnabled("item_invis_sword") &&
+				this.sbTriggers.IsEnabled("phantom_assassin_stifling_dagger"))
 
 		if (checkProjectiles) {
 			for (const proj of ProjectileManager.AllTrackingProjectiles) {
@@ -345,6 +369,14 @@ class AutoItemsUtility {
 			// 6. Pipe of Insight (No-Target)
 			if (itemName === "item_pipe") {
 				if (this.pipeTriggers.IsEnabled("zuus_thundergods_wrath") && triggerZeus) {
+					this.castNoTargetItem(hero, item)
+					return
+				}
+			}
+
+			// 7. Shadow Blade / Silver Edge (No-Target)
+			if (itemName === "item_invis_sword" || itemName === "item_silver_edge") {
+				if (this.sbTriggers.IsEnabled("phantom_assassin_stifling_dagger") && triggerProjectile) {
 					this.castNoTargetItem(hero, item)
 					return
 				}
